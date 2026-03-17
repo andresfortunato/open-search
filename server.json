@@ -1,41 +1,19 @@
 {
-  "name": "open-search",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.andresfortunato/open-search",
+  "title": "Open Search MCP",
   "description": "Open source MCP search server for Claude Code. Replaces WebSearch + WebFetch with a single tool call returning verbatim, query-relevant excerpts.",
-  "repository": "https://github.com/andresfortunato/open-search",
-  "homepage": "https://github.com/andresfortunato/open-search",
-  "license": "MIT",
-  "runtime": "python",
-  "install": {
-    "pip": "git+https://github.com/andresfortunato/open-search.git",
-    "uvx": "uvx --from git+https://github.com/andresfortunato/open-search.git open-search-mcp"
+  "repository": {
+    "url": "https://github.com/andresfortunato/open-search",
+    "source": "github"
   },
-  "tools": [
+  "version": "0.1.0",
+  "packages": [
     {
-      "name": "search",
-      "description": "Search the web and return extracted content optimized for LLM consumption. Returns structured results with title, URL, relevance score, and clean markdown content extracted from each page.",
-      "parameters": {
-        "query": {"type": "string", "description": "Search query string", "required": true},
-        "max_results": {"type": "integer", "description": "Number of results (1-10)", "default": 5},
-        "include_domains": {"type": "array", "description": "Only include results from these domains"},
-        "exclude_domains": {"type": "array", "description": "Exclude results from these domains"},
-        "time_range": {"type": "string", "description": "Filter by time: day, week, month, year"}
-      }
-    },
-    {
-      "name": "extract",
-      "description": "Extract clean markdown content from specific URLs. Fetches pages, strips boilerplate, and returns main content. Direct replacement for WebFetch without AI summarization.",
-      "parameters": {
-        "urls": {"type": ["string", "array"], "description": "URL or list of URLs to extract (max 10)", "required": true},
-        "query": {"type": "string", "description": "Optional query to score content by relevance"}
-      }
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "open-search-mcp",
+      "version": "0.1.0"
     }
-  ],
-  "environment_variables": [
-    {"name": "SEARXNG_URL", "description": "SearXNG instance URL", "default": "http://localhost:8888"},
-    {"name": "FETCH_TIMEOUT", "description": "HTTP fetch timeout in seconds", "default": "4"},
-    {"name": "OPEN_SEARCH_CHUNK_CHARS", "description": "Target chars per result", "default": "500"},
-    {"name": "OPEN_SEARCH_DEBUG", "description": "Enable debug logging", "default": "false"}
-  ],
-  "requirements": ["Docker (for SearXNG search backend)"],
-  "tags": ["search", "web-search", "mcp", "claude-code", "searxng"]
+  ]
 }
