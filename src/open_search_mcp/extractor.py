@@ -52,13 +52,7 @@ _USER_AGENTS = [
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:133.0) Gecko/20100101 Firefox/133.0",
 ]
 
-# Playwright is optional — detected at import time
-_playwright_available = False
-try:
-    from playwright.async_api import async_playwright
-    _playwright_available = True
-except ImportError:
-    pass
+from playwright.async_api import async_playwright
 
 
 def extract_content(
@@ -122,12 +116,26 @@ class PlaywrightBrowser:
         self._browser = None
 
     async def start(self) -> None:
-        """Launch the browser. Called once during MCP lifespan startup."""
-        if not _playwright_available:
-            return
-        self._playwright = await async_playwright().start()
-        self._browser = await self._playwright.chromium.launch(headless=True)
-        logger.info("Playwright browser launched.")
+        """Launch the browser. Called once during MCP lifespan startup.
+
+        If the Chromium binary isn't installed, logs a message and continues
+        without browser support. Run 'playwright install chromium' to enable.
+        """
+        try:
+            self._playwright = await async_playwright().start()
+            self._browser = await self._playwright.chromium.launch(headless=True)
+            logger.info("Playwright browser launched.")
+        except Exception as e:
+            logger.warning(
+                "Playwright browser not available: %s. "
+                "Run 'playwright install chromium' for better extraction.",
+                e,
+            )
+            # Clean up partial state
+            if self._playwright:
+                await self._playwright.stop()
+            self._playwright = None
+            self._browser = None
 
     async def stop(self) -> None:
         """Close the browser. Called during MCP lifespan shutdown."""

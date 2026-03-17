@@ -28,10 +28,8 @@ dependencies = [
     "rank-bm25>=0.2.2",
     "fastembed>=0.4.0",
     "numpy>=1.24.0",
+    "playwright>=1.40.0",
 ]
-
-[project.optional-dependencies]
-browser = ["playwright>=1.40.0"]
 
 [project.scripts]
 open-search-mcp = "open_search_mcp.server:main"

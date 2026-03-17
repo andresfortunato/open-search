@@ -1,6 +1,6 @@
 """Tests for extractor module — stream processing, early return, and caching."""
 
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 from open_search_mcp.cache import URLCache
 
@@ -79,14 +79,13 @@ async def test_returns_fewer_when_not_enough_succeed(mock_client):
 
     mock_client.get = mock_get
 
-    with patch("open_search_mcp.extractor._playwright_available", False):
-        results = await fetch_and_extract(
-            client=mock_client,
-            urls=urls,
-            max_results=5,
-        )
+    results = await fetch_and_extract(
+        client=mock_client,
+        urls=urls,
+        max_results=5,
+    )
 
-    # Only 2 URLs succeeded, so we get 2 results
+    # Only 2 URLs succeeded, so we get 2 (no Playwright browser passed)
     assert len(results) == 2
 
 
@@ -102,12 +101,11 @@ async def test_all_urls_fail_returns_empty(mock_client):
 
     mock_client.get = mock_get
 
-    with patch("open_search_mcp.extractor._playwright_available", False):
-        results = await fetch_and_extract(
-            client=mock_client,
-            urls=urls,
-            max_results=5,
-        )
+    results = await fetch_and_extract(
+        client=mock_client,
+        urls=urls,
+        max_results=5,
+    )
 
     assert results == []
 

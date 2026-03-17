@@ -48,26 +48,19 @@ open-search-mcp uses [SearXNG](https://docs.searxng.org/) as its search backend.
 
 ## Install
 
- One-command install:
-
 ```bash
 claude mcp add open-search -- uvx --from git+https://github.com/andresfortunato/open-search.git open-search-mcp
 ```
 
 That's it. Claude Code will run `uvx` to fetch and start the server on demand.
 
- With Playwright (recommended — improves extraction from 76% to ~100%):
+**Optional: install Chromium for ~100% extraction success** (vs 76% without):
 
 ```bash
-# Clone for browser support (uvx doesn't support extras yet)
-git clone https://github.com/andresfortunato/open-search.git
-cd open-search
-uv venv && uv pip install -e ".[browser]"
 playwright install chromium
-
-# Add to Claude Code
-claude mcp add open-search -- $(pwd)/.venv/bin/open-search-mcp
 ```
+
+Without Chromium, the server works fine — it just can't extract from JS-rendered pages (Reddit, Medium, etc.). The server detects whether Chromium is available at startup and falls back gracefully.
 
 ### Manual config
 
