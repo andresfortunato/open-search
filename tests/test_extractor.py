@@ -1,7 +1,9 @@
-"""Tests for extractor module — stream processing and early return."""
+"""Tests for extractor module — stream processing, early return, and caching."""
 
 import asyncio
 from unittest.mock import AsyncMock, patch, MagicMock
+
+from open_search_mcp.cache import URLCache
 
 import httpx
 import pytest
@@ -169,3 +171,72 @@ async def test_chunk_selection_applied_with_query(mock_client):
     assert len(results) == 1
     # Content should be chunked down from the full page
     assert len(results[0]["content"]) < len(long_content)
+
+
+# --- Item 2: Cache integration ---
+
+@pytest.mark.asyncio
+async def test_cache_hit_avoids_refetch(mock_client):
+    """When a URL is cached, fetch_and_extract uses cache and skips HTTP fetch."""
+    from open_search_mcp.extractor import fetch_and_extract
+
+    cache = URLCache(ttl_seconds=300)
+    cache.put("https://example.com/cached", {"title": "Cached Title", "content": "Cached body text"})
+
+    fetch_count = 0
+
+    async def mock_get(url):
+        nonlocal fetch_count
+        fetch_count += 1
+        resp = MagicMock()
+        resp.status_code = 200
+        content = "Fresh content from the web. " * 5
+        resp.text = _make_html("Fresh Title", content)
+        resp.raise_for_status = MagicMock()
+        return resp
+
+    mock_client.get = mock_get
+
+    results = await fetch_and_extract(
+        client=mock_client,
+        urls=["https://example.com/cached", "https://example.com/fresh"],
+        cache=cache,
+        max_results=5,
+    )
+
+    assert len(results) == 2
+    # Cached URL should not trigger a fetch
+    assert fetch_count == 1  # only the fresh URL was fetched
+    # Cached result should have cached content
+    cached_result = [r for r in results if r["url"] == "https://example.com/cached"][0]
+    assert cached_result["title"] == "Cached Title"
+
+
+@pytest.mark.asyncio
+async def test_fetched_urls_get_cached(mock_client):
+    """Successfully fetched URLs should be added to the cache."""
+    from open_search_mcp.extractor import fetch_and_extract
+
+    cache = URLCache(ttl_seconds=300)
+    content = "This is substantial content for testing extraction quality. " * 5
+
+    async def mock_get(url):
+        resp = MagicMock()
+        resp.status_code = 200
+        resp.text = _make_html("Page Title", content)
+        resp.raise_for_status = MagicMock()
+        return resp
+
+    mock_client.get = mock_get
+
+    await fetch_and_extract(
+        client=mock_client,
+        urls=["https://example.com/page1"],
+        cache=cache,
+        max_results=5,
+    )
+
+    # URL should now be cached
+    cached = cache.get("https://example.com/page1")
+    assert cached is not None
+    assert cached["title"] == "Page Title"

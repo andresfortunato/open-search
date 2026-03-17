@@ -11,6 +11,7 @@ import httpx
 from mcp.server.fastmcp import FastMCP, Context
 
 from .searcher import search_searxng, score_with_bm25
+from .cache import URLCache
 from .extractor import fetch_and_extract
 from .chunker import _get_model
 
@@ -70,13 +71,15 @@ async def app_lifespan(server: FastMCP):
     # Pre-warm embedding model so first search doesn't pay load penalty
     await asyncio.to_thread(_get_model)
 
+    url_cache = URLCache(ttl_seconds=300)
+
     async with httpx.AsyncClient(
         follow_redirects=True,
         timeout=httpx.Timeout(FETCH_TIMEOUT),
         headers={"User-Agent": "search-mcp/0.1 (content extraction for LLMs)"},
         limits=httpx.Limits(max_connections=20, max_keepalive_connections=10),
     ) as client:
-        yield {"http_client": client}
+        yield {"http_client": client, "url_cache": url_cache}
 
 
 mcp = FastMCP("search", lifespan=app_lifespan)
@@ -104,7 +107,9 @@ async def search(
         time_range: Filter by time: 'day', 'week', 'month', 'year'
     """
     max_results = max(1, min(10, max_results))
-    client: httpx.AsyncClient = ctx.request_context.lifespan_context["http_client"]
+    lifespan_ctx = ctx.request_context.lifespan_context
+    client: httpx.AsyncClient = lifespan_ctx["http_client"]
+    url_cache: URLCache = lifespan_ctx["url_cache"]
 
     # Step 1: Search SearXNG (overfetch to handle extraction failures)
     try:
@@ -126,12 +131,12 @@ async def search(
     urls = [r["url"] for r in search_results]
 
     # Step 2: Fetch and extract content concurrently (with chunk selection)
-    # Pass max_results so fetch_and_extract can return early once enough pages succeed
     extracted = await fetch_and_extract(
         client=client,
         urls=urls,
         query=query,
         max_results=max_results,
+        cache=url_cache,
         max_concurrent=MAX_CONCURRENT,
         max_length=MAX_CONTENT_LENGTH,
     )
@@ -187,12 +192,15 @@ async def extract(
         urls = [urls]
     urls = urls[:10]
 
-    client: httpx.AsyncClient = ctx.request_context.lifespan_context["http_client"]
+    lifespan_ctx = ctx.request_context.lifespan_context
+    client: httpx.AsyncClient = lifespan_ctx["http_client"]
+    url_cache: URLCache = lifespan_ctx["url_cache"]
 
     extracted = await fetch_and_extract(
         client=client,
         urls=urls,
         query=query,
+        cache=url_cache,
         max_concurrent=MAX_CONCURRENT,
         max_length=MAX_CONTENT_LENGTH,
     )

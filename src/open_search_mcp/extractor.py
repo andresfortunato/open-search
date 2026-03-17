@@ -10,6 +10,7 @@ import logging
 import httpx
 import trafilatura
 
+from .cache import URLCache
 from .chunker import select_chunks
 
 logger = logging.getLogger(__name__)
@@ -143,6 +144,7 @@ async def fetch_and_extract(
     urls: list[str],
     query: str | None = None,
     max_results: int | None = None,
+    cache: URLCache | None = None,
     max_concurrent: int = MAX_CONCURRENT,
     max_length: int = MAX_CONTENT_LENGTH,
     target_chars: int = TARGET_CHUNK_CHARS,
@@ -153,8 +155,28 @@ async def fetch_and_extract(
     Processes pages as fetches complete. Stops collecting once max_results
     pages are successfully extracted. When query is provided, content is
     reduced to the most query-relevant chunks via embeddings.
+    Optionally caches extracted content (pre-chunking) by URL.
     """
     target_count = max_results if max_results else len(urls)
+
+    # Separate cached and uncached URLs
+    results = []
+    urls_to_fetch = []
+    for url in urls:
+        if cache:
+            cached = cache.get(url)
+            if cached:
+                results.append({"url": url, **cached})
+                if len(results) >= target_count:
+                    break
+                continue
+        urls_to_fetch.append(url)
+
+    # If cache satisfied everything, skip fetching
+    if len(results) >= target_count:
+        # Still apply chunk selection
+        return await _apply_chunk_selection(results, query, target_chars)
+
     semaphore = asyncio.Semaphore(max_concurrent)
 
     # Launch all fetches as tasks
@@ -175,13 +197,15 @@ async def fetch_and_extract(
         return {"url": url, **extracted}
 
     # Create all tasks and process as they complete
-    tasks = {asyncio.ensure_future(fetch_and_process(url)): url for url in urls}
-    results = []
+    tasks = {asyncio.ensure_future(fetch_and_process(url)): url for url in urls_to_fetch}
     failed_urls = []
 
     for coro in asyncio.as_completed(tasks.keys()):
         result = await coro
         if result:
+            # Cache the pre-chunking content
+            if cache:
+                cache.put(result["url"], {"title": result["title"], "content": result["content"]})
             results.append(result)
             if len(results) >= target_count:
                 break
@@ -213,7 +237,15 @@ async def fetch_and_extract(
                 if extracted:
                     results.append({"url": url, **extracted})
 
-    # Apply chunk selection to all results
+    return await _apply_chunk_selection(results, query, target_chars)
+
+
+async def _apply_chunk_selection(
+    results: list[dict],
+    query: str | None,
+    target_chars: int,
+) -> list[dict]:
+    """Apply embeddings-based chunk selection to all results."""
     final = []
     for r in results:
         content = r["content"]
@@ -226,5 +258,4 @@ async def fetch_and_extract(
             "title": r["title"],
             "content": content,
         })
-
     return final
