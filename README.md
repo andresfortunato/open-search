@@ -84,6 +84,17 @@ Add to `~/.claude.json`:
 }
 ```
 
+### Make it the default search
+
+Add this to your `~/.claude/CLAUDE.md` (global) or project `CLAUDE.md` so Claude Code prefers open-search over the built-in WebSearch:
+
+```markdown
+# Search
+Use the `search` MCP tool (from open-search) instead of WebSearch for all web searches.
+Use the `extract` MCP tool instead of WebFetch for URL content extraction.
+These tools return verbatim source text with higher extraction success in a single tool call.
+```
+
 ## Tools
 
 ### `search`
