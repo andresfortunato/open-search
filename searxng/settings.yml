@@ -1,7 +1,7 @@
 use_default_settings: true
 
 server:
-  secret_key: "7bcc6728078cc6305af71bfbbe4dac1e7758c873c991ec312e029e6ea2e2c870"
+  secret_key: "REPLACE_ME_ON_FIRST_RUN"
   limiter: false
   image_proxy: false
 

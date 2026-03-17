@@ -126,6 +126,8 @@ Environment variables:
 | `FETCH_TIMEOUT` | `4` | HTTP fetch timeout in seconds |
 | `MAX_CONTENT_LENGTH` | `20000` | Max chars extracted per page before chunking |
 | `MAX_CONCURRENT_FETCHES` | `5` | Max concurrent URL fetches |
+| `OPEN_SEARCH_CHUNK_CHARS` | `500` | Target chars per result (chunk budget) |
+| `OPEN_SEARCH_DEBUG` | `false` | Enable debug logging (pipeline timing per query) |
 | `OPEN_SEARCH_COMPOSE_DIR` | (auto-detected) | Path to docker-compose.yml |
 
 ## Architecture

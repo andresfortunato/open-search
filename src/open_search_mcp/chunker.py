@@ -2,6 +2,7 @@
 embed query + paragraphs, return the most relevant chunks."""
 
 import logging
+import os
 
 import numpy as np
 from fastembed import TextEmbedding
@@ -12,10 +13,10 @@ logger = logging.getLogger(__name__)
 _model: TextEmbedding | None = None
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
-# Chunk sizing
+# Chunk sizing (TARGET_TOTAL_CHARS configurable via env var)
 MIN_CHUNK_CHARS = 50
 MAX_CHUNK_CHARS = 1000
-TARGET_TOTAL_CHARS = 500
+TARGET_TOTAL_CHARS = int(os.environ.get("OPEN_SEARCH_CHUNK_CHARS", "500"))
 
 
 def _get_model() -> TextEmbedding:

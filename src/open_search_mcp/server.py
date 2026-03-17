@@ -3,7 +3,9 @@
 import asyncio
 import os
 import logging
+import secrets
 import subprocess
+import time
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -23,12 +25,26 @@ SEARXNG_URL = os.environ.get("SEARXNG_URL", "http://localhost:8888")
 FETCH_TIMEOUT = float(os.environ.get("FETCH_TIMEOUT", "4"))
 MAX_CONTENT_LENGTH = int(os.environ.get("MAX_CONTENT_LENGTH", "20000"))
 MAX_CONCURRENT = int(os.environ.get("MAX_CONCURRENT_FETCHES", "5"))
+DEBUG = os.environ.get("OPEN_SEARCH_DEBUG", "").lower() in ("1", "true", "yes")
 
 # docker-compose.yml lives at repo root (two levels up from this file in src layout)
 COMPOSE_DIR = os.environ.get(
     "OPEN_SEARCH_COMPOSE_DIR",
     str(Path(__file__).parent.parent.parent),
 )
+
+
+def _ensure_searxng_secret_key() -> None:
+    """Generate a random secret key in settings.yml on first run."""
+    settings_path = Path(COMPOSE_DIR) / "searxng" / "settings.yml"
+    if not settings_path.exists():
+        return
+    content = settings_path.read_text()
+    if "REPLACE_ME_ON_FIRST_RUN" in content:
+        new_key = secrets.token_hex(32)
+        content = content.replace("REPLACE_ME_ON_FIRST_RUN", new_key)
+        settings_path.write_text(content)
+        logger.info("Generated SearXNG secret key.")
 
 
 async def _ensure_searxng_running() -> None:
@@ -66,10 +82,16 @@ async def _ensure_searxng_running() -> None:
 @asynccontextmanager
 async def app_lifespan(server: FastMCP):
     """Start SearXNG if needed, pre-warm embedding model, provide shared httpx client."""
+    _ensure_searxng_secret_key()
+
+    logger.warning("[open-search] Starting SearXNG...")
     await _ensure_searxng_running()
+    logger.warning("[open-search] SearXNG ready.")
 
     # Pre-warm embedding model so first search doesn't pay load penalty
+    logger.warning("[open-search] Loading embedding model (first run may download ~80MB)...")
     await asyncio.to_thread(_get_model)
+    logger.warning("[open-search] Model ready.")
 
     url_cache = URLCache(ttl_seconds=300)
 
@@ -154,8 +176,11 @@ async def search(
     client: httpx.AsyncClient = lifespan_ctx["http_client"]
     url_cache: URLCache = lifespan_ctx["url_cache"]
 
+    t_start = time.perf_counter()
+
     # Step 1: Search SearXNG (overfetch to handle extraction failures)
     # Uses recovery wrapper to auto-restart SearXNG on connection failure
+    t0 = time.perf_counter()
     try:
         search_results = await _search_with_recovery(
             client=client,
@@ -168,6 +193,7 @@ async def search(
         )
     except RuntimeError as e:
         return str(e)
+    t_search = time.perf_counter() - t0
 
     if not search_results:
         return f"No search results found for: {query}"
@@ -175,6 +201,7 @@ async def search(
     urls = [r["url"] for r in search_results]
 
     # Step 2: Fetch and extract content concurrently (with chunk selection)
+    t0 = time.perf_counter()
     extracted = await fetch_and_extract(
         client=client,
         urls=urls,
@@ -184,6 +211,7 @@ async def search(
         max_concurrent=MAX_CONCURRENT,
         max_length=MAX_CONTENT_LENGTH,
     )
+    t_extract = time.perf_counter() - t0
 
     # Step 3: Fall back to snippets for URLs where extraction failed
     extracted_urls = {r["url"] for r in extracted}
@@ -203,6 +231,17 @@ async def search(
     # Step 4: Score with BM25 and return top results
     scored = score_with_bm25(query, extracted, content_key="content")
     top = scored[:max_results]
+
+    t_total = time.perf_counter() - t_start
+    total_chars = sum(len(r["content"]) for r in top)
+
+    if DEBUG:
+        logger.warning(
+            "[open-search] query=%r search=%.0fms extract=%.0fms total=%.0fms "
+            "results=%d chars=%d",
+            query, t_search * 1000, t_extract * 1000, t_total * 1000,
+            len(top), total_chars,
+        )
 
     # Format as structured text for the LLM
     parts = []
