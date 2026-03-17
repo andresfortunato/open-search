@@ -1,28 +1,23 @@
 [
   {
     "query": "how to implement rate limiting in FastAPI",
-    "output": "## Result 1 (score: 1.0)\n**Rate Limiting for Your FastAPI App - Upstash Documentation**\nhttps://upstash.com/docs/redis/tutorials/python_rate_limiting\n\nIn this tutorial, we\u2019ll learn how to add rate limiting to a FastAPI application using Upstash Redis. Rate limiting is essential for controlling API usage and with Upstash Redis, you can easily implement rate limiting to protect your API resources. We\u2019ll set up a simple FastAPI app and apply rate limiting to its endpoints. With Upstash Redis, we\u2019ll configure a fixed window rate limiter that allows a specific number of requests per given time period.### Environment Setup\n\n---\n\n## Result 2 (score: 0.9216)\n**Implementing a Rate Limiter with FastAPI and Redis**\nhttps://bryananthonio.com/blog/implementing-rate-limiter-fastapi-redis/\n\nTo answer that, we\u2019ll explore how to implement a basic rate limiter from scratch for an API service built with [FastAPI](https://fastapi.tiangolo.com) by using [Redis](https://redis.io). We\u2019ll build the same type of system that powers API request management in many enterprise platforms.\n\nFrom here, we can implement rate limiting as shown below:\n\n---\n\n## Result 3 (score: 0.5845)\n**python - Ratelimit in Fastapi - Stack Overflow**\nhttps://stackoverflow.com/questions/65491184/ratelimit-in-fastapi\n\n[snippet] How to ratelimit API endpoint request in Fastapi application ? I need to ratelimit API call 5 request per second per user and exceeding that limit blocks that particular user for 60 seconds. In mai...\n\n---\n\n## Result 4 (score: 0.5644)\n****\nhttps://codesignal.com/learn/courses/implementing-rate-limiting-6/lessons/implementing-rate-limiting\n\n**SlowAPI** is a popular Python library specifically designed to add rate limiting to FastAPI and Starlette applications. It's built on top of the well-established Flask-Limiter library, adapting its proven rate-limiting capabilities for async frameworks. SlowAPI integrates seamlessly with FastAPI's middleware system to provide both global and per-route rate limiting.\n\nRate limiters in FastAPI work as middleware components:\n\nWe can test our rate limiter implementation using this Python test script:\n\n---\n\n## Result 5 (score: 0.4853)\n**Rate Limiting with FastAPI: An In-Depth Guide | by Dhruv Patel | Medium**\nhttps://thedkpatel.medium.com/rate-limiting-with-fastapi-an-in-depth-guide-c4d64a776b83\n\n[snippet] Rate limiting is a crucial feature for protecting your API from abuse and ensuring a fair distribution of resources among users. FastAPI, with its asynchronous nature, makes it easy to implement rate limiting, whether through custom middleware, Redis-based solutions, or using third-party libraries like slowapi.",
-    "total_ms": 4235,
-    "search_ms": 1099,
-    "extract_ms": 3136,
+    "output": "## Result 1 (score: 1.0)\n**Implementing a Rate Limiter with FastAPI and Redis**\nhttps://bryananthonio.com/blog/implementing-rate-limiter-fastapi-redis/\n\nTo answer that, we\u2019ll explore how to implement a basic rate limiter from scratch for an API service built with [FastAPI](https://fastapi.tiangolo.com) by using [Redis](https://redis.io). We\u2019ll build the same type of system that powers API request management in many enterprise platforms.\n\nFrom here, we can implement rate limiting as shown below:\n\n---\n\n## Result 2 (score: 0.8844)\n**Rate Limiting for Your FastAPI App - Upstash Documentation**\nhttps://upstash.com/docs/redis/tutorials/python_rate_limiting\n\nIn this tutorial, we\u2019ll learn how to add rate limiting to a FastAPI application using Upstash Redis. Rate limiting is essential for controlling API usage and with Upstash Redis, you can easily implement rate limiting to protect your API resources. We\u2019ll set up a simple FastAPI app and apply rate limiting to its endpoints. With Upstash Redis, we\u2019ll configure a fixed window rate limiter that allows a specific number of requests per given time period.### Environment Setup\n\n---\n\n## Result 3 (score: 0.3566)\n****\nhttps://codesignal.com/learn/courses/implementing-rate-limiting-6/lessons/implementing-rate-limiting\n\n**SlowAPI** is a popular Python library specifically designed to add rate limiting to FastAPI and Starlette applications. It's built on top of the well-established Flask-Limiter library, adapting its proven rate-limiting capabilities for async frameworks. SlowAPI integrates seamlessly with FastAPI's middleware system to provide both global and per-route rate limiting.\n\nRate limiters in FastAPI work as middleware components:\n\nWe can test our rate limiter implementation using this Python test script:\n\n---\n\n## Result 4 (score: 0.3211)\n**Quick and Easy Rate Limiting for FastAPI**\nhttps://www.youtube.com/watch?v=pZunzLJ1qcQ\n\nAbout\nPress\nCopyright\nContact us\nCreators\nAdvertise\nDevelopers\nTerms\nPrivacy\nPolicy & Safety\nHow YouTube works\nTest new features\nNFL Sunday Ticket\n\u00a9 2026 Google LLC\n\n---\n\n## Result 5 (score: 0.1953)\n**Develop Your own API Rate Limiter in FastAPI \u2014 Part I - Medium**\nhttps://medium.com/@viswanathan.arjun/develop-your-own-api-rate-limiter-in-fastapi-part-i-c9f0c88b49b5\n\n[snippet] Oct 10, 2023 ... The initial value of self.tokens is set to 10. Each time an API call is made, this value is reduced. However, to ensure that the number of\u00a0...",
+    "total_ms": 3187,
+    "search_ms": 688,
+    "extract_ms": 2498,
     "num_results": 5,
-    "total_chars": 2663,
-    "est_tokens": 666,
+    "total_chars": 2442,
+    "est_tokens": 610,
     "results": [
-      {
-        "title": "Rate Limiting for Your FastAPI App - Upstash Documentation",
-        "url": "https://upstash.com/docs/redis/tutorials/python_rate_limiting",
-        "chars": 473
-      },
       {
         "title": "Implementing a Rate Limiter with FastAPI and Redis",
         "url": "https://bryananthonio.com/blog/implementing-rate-limiter-fastapi-redis/",
         "chars": 346
       },
       {
-        "title": "python - Ratelimit in Fastapi - Stack Overflow",
-        "url": "https://stackoverflow.com/questions/65491184/ratelimit-in-fastapi",
-        "chars": 210
+        "title": "Rate Limiting for Your FastAPI App - Upstash Documentation",
+        "url": "https://upstash.com/docs/redis/tutorials/python_rate_limiting",
+        "chars": 473
       },
       {
         "title": "",
@@ -30,21 +25,26 @@
         "chars": 503
       },
       {
-        "title": "Rate Limiting with FastAPI: An In-Depth Guide | by Dhruv Patel | Medium",
-        "url": "https://thedkpatel.medium.com/rate-limiting-with-fastapi-an-in-depth-guide-c4d64a776b83",
-        "chars": 322
+        "title": "Quick and Easy Rate Limiting for FastAPI",
+        "url": "https://www.youtube.com/watch?v=pZunzLJ1qcQ",
+        "chars": 164
+      },
+      {
+        "title": "Develop Your own API Rate Limiter in FastAPI \u2014 Part I - Medium",
+        "url": "https://medium.com/@viswanathan.arjun/develop-your-own-api-rate-limiter-in-fastapi-part-i-c9f0c88b49b5",
+        "chars": 169
       }
     ]
   },
   {
     "query": "what causes lithium battery thermal runaway",
-    "output": "## Result 1 (score: 1.0)\n**04.2 What is thermal runaway? | EV Fire Safe**\nhttps://www.evfiresafe.com/ev-fire-what-is-thermal-runaway\n\n## 04.2 What is thermal runaway?\n\n### All EV traction battery fires start with thermal runaway\n\nThermal runaway occurs when a battery cell short circuits & starts to heat up uncontrollably.\n\n### Watch lithium ion batteries in thermal runaway\n\nThis video shows 5 x cylindrical lithium ion battery cells, forced into thermal runaway in test conditions. Please note:\n\n### How does thermal runaway happen & progress?\n\n### 1.\n\n### Multiple battery cells create a module\n\n---\n\n## Result 2 (score: 0.37)\n**What is thermal runaway in lithium-ion batteries**\nhttps://www.gasmet.com/blog/what-is-thermal-runaway-in-lithium-ion-batteries-risks-and-causes/\n\n# What is thermal runaway in lithium-ion batteries\n\nBatteries are designed to store chemical energy, and during thermal runaway, this chemical energy is uncontrollably released. In lithium-ion batteries (LIBs), thermal runaway can be caused by e.g. mechanical damage, external heat, short circuit, or overcharging.\n\n---\n\n## Result 3 (score: 0.2749)\n**What is Thermal Runaway in Batteries? Causes**\nhttps://www.ossila.com/pages/thermal-runaway\n\nThermal runaway is when a battery cell heats up too quickly and cannot release the amount of heat it\u2019s generating. The temperature rise causes resistance to decrease and current to increase which in turn also add to the temperature. Increasing temperatures increase the rate of reactions, creating an uncontrollable cycle. The thermal runaway of one cell cause others to do the same, this is often referred to as thermal runaway propagation. The excess heat produced can lead to burning and eventually battery explosion and fires. Therefore, it is important to understand thermal runaway and investigate ways of prevention to increase the safety of Li-ion batteries.\n\n---\n\n## Result 4 (score: 0.2343)\n**What Is Thermal Runaway? Common Causes and How to Prevent It**\nhttps://www.empteezy.co.uk/blogs/editorial/what-is-thermal-runaway-common-causes-and-how-to-prevent-it\n\nThermal runaway is a dangerous phenomenon where a system, such as a lithium-ion battery, experiences a self-sustaining increase in temperature due to a chain reaction of events. The heat generated by chemical reactions inside the battery causes even more heat, leading to a continuous rise in temperature. This can result in the battery venting and releasing toxic flammable gases, exploding or catching fire.\n\n---\n\n## Result 5 (score: 0.1407)\n**Journal Article Quantifies the Fire Hazards of Lithium-Ion Battery Fires Caused by Thermal Runaway in E-scooters**\nhttps://fsri.org/research-update/journal-article-quantifies-fire-hazards-lithium-ion-battery-fires-caused-thermal\n\n## Understanding Fire Hazard from Thermal Runaway in Lithium-Ion Batteries\n\nThis journal article summarizes a [study](https://fsri.org/research-update/experiments-completed-intentional-thermal-runaway-lithium-ion-batteries) conducted by FSRI in partnership with researchers from UL Solutions and FDNY. This study consisted of three series of experiments to characterize thermal runaway of the lithium-ion battery pack of a seated e-scooter:",
-    "total_ms": 8549,
-    "search_ms": 2202,
-    "extract_ms": 6347,
+    "output": "## Result 1 (score: 1.0)\n**04.2 What is thermal runaway? | EV Fire Safe**\nhttps://www.evfiresafe.com/ev-fire-what-is-thermal-runaway\n\n## 04.2 What is thermal runaway?\n\n### All EV traction battery fires start with thermal runaway\n\nThermal runaway occurs when a battery cell short circuits & starts to heat up uncontrollably.\n\n### Watch lithium ion batteries in thermal runaway\n\nThis video shows 5 x cylindrical lithium ion battery cells, forced into thermal runaway in test conditions. Please note:\n\n### How does thermal runaway happen & progress?\n\n### 1.\n\n### Multiple battery cells create a module\n\n---\n\n## Result 2 (score: 0.427)\n**What is thermal runaway in lithium-ion batteries**\nhttps://www.gasmet.com/blog/what-is-thermal-runaway-in-lithium-ion-batteries-risks-and-causes/\n\n# What is thermal runaway in lithium-ion batteries\n\nBatteries are designed to store chemical energy, and during thermal runaway, this chemical energy is uncontrollably released. In lithium-ion batteries (LIBs), thermal runaway can be caused by e.g. mechanical damage, external heat, short circuit, or overcharging.\n\n---\n\n## Result 3 (score: 0.3097)\n**Thermal runaway - Wikipedia**\nhttps://en.wikipedia.org/wiki/Thermal_runaway\n\n[snippet] Thermal runaway occurs in situations where an increase in temperature changes the conditions in a way that causes a further increase in temperature, often\u00a0...\n\n---\n\n## Result 4 (score: 0.2875)\n**What Is Thermal Runaway? Common Causes and How to Prevent It**\nhttps://www.empteezy.co.uk/blogs/editorial/what-is-thermal-runaway-common-causes-and-how-to-prevent-it\n\nThermal runaway is a dangerous phenomenon where a system, such as a lithium-ion battery, experiences a self-sustaining increase in temperature due to a chain reaction of events. The heat generated by chemical reactions inside the battery causes even more heat, leading to a continuous rise in temperature. This can result in the battery venting and releasing toxic flammable gases, exploding or catching fire.\n\n---\n\n## Result 5 (score: 0.2708)\n**EV Thermal Runaway: Causes and Prevention Strategies**\nhttps://www.neuralconcept.com/post/ev-thermal-runaway-causes-and-prevention-strategies\n\n[snippet] One primary cause of thermal runaway in EV battery packs is internal short circuits within individual battery cells.",
+    "total_ms": 5591,
+    "search_ms": 765,
+    "extract_ms": 4825,
     "num_results": 5,
-    "total_chars": 3210,
-    "est_tokens": 802,
+    "total_chars": 2296,
+    "est_tokens": 574,
     "results": [
       {
         "title": "04.2 What is thermal runaway? | EV Fire Safe",
@@ -57,9 +57,9 @@
         "chars": 314
       },
       {
-        "title": "What is Thermal Runaway in Batteries? Causes",
-        "url": "https://www.ossila.com/pages/thermal-runaway",
-        "chars": 666
+        "title": "Thermal runaway - Wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Thermal_runaway",
+        "chars": 168
       },
       {
         "title": "What Is Thermal Runaway? Common Causes and How to Prevent It",
@@ -67,36 +67,26 @@
         "chars": 409
       },
       {
-        "title": "Journal Article Quantifies the Fire Hazards of Lithium-Ion Battery Fires Caused by Thermal Runaway in E-scooters",
-        "url": "https://fsri.org/research-update/journal-article-quantifies-fire-hazards-lithium-ion-battery-fires-caused-thermal",
-        "chars": 440
+        "title": "EV Thermal Runaway: Causes and Prevention Strategies",
+        "url": "https://www.neuralconcept.com/post/ev-thermal-runaway-causes-and-prevention-strategies",
+        "chars": 126
       }
     ]
   },
   {
     "query": "best practices for PostgreSQL index optimization",
-    "output": "## Result 1 (score: 1.0)\n**Mastering Indexes in PostgreSQL: A Real-World Guide**\nhttps://thinhdanggroup.github.io/indexing-mistakes/\n\nWhether you\u2019re a database newbie or a seasoned professional, this guide will provide valuable insights into the effective use of indexes in PostgreSQL. By following the best practices outlined in this guide, you can optimize your PostgreSQL database performance and make the most of your PostgreSQL experience.\n\n---\n\n## Result 2 (score: 0.504)\n**How to Create Effective Indexes in PostgreSQL**\nhttps://oneuptime.com/blog/post/2026-01-21-postgresql-indexes/view\n\nIndexes are critical for PostgreSQL performance. Well-designed indexes can speed up queries by orders of magnitude, while poor indexing wastes storage and slows down writes. This guide covers all PostgreSQL index types and when to use each.\n\n---\n\n## Result 3 (score: 0.2626)\n**Why Your PostgreSQL Indexes Might Be Hurting You (and How to Fix Them) | Timescale**\nhttps://medium.com/timescale/why-your-postgresql-indexes-might-be-hurting-you-and-how-to-fix-them-a8511ebc4779\n\n[snippet] Check out Part II of our series on PostgreSQL performance tuning for more detailed configuration recommendations for both of these parameters. This doesn\u2019t allocate memory \u2014 it estimates how much is available for caching. A higher value makes the planner more likely to use indexes. \ud83e\udde0 Best Practice: Set it to 50\u201370 % of your system\u2019s total memory.\n\n---\n\n## Result 4 (score: 0.2566)\n**PostgreSQL Tuning: Database Indexes | Tiger Data**\nhttps://www.tigerdata.com/learn/postgresql-performance-tuning-optimizing-database-indexes\n\n, play a crucial role in optimizing indexes in a PostgreSQL database, so with best practices, you can get serious results. The `ANALYZE`\n\nAn efficient PostgreSQL indexing is a potent ally for fine-tuning data retrieval within your applications. Indexing is a balancing act, but creating the appropriate indexes and maintaining them will significantly enhance the overall performance of your PostgreSQL database.\n\n---\n\n## Result 5 (score: 0.2138)\n**Optimizing PostgreSQL queries: 12 indexing pitfalls and how we fixed them | Cubbit**\nhttps://medium.com/cubbit/optimizing-postgresql-queries-12-indexing-pitfalls-and-how-we-fixed-them-81c25615a84e\n\n[snippet] When it comes to optimizing PostgreSQL queries, here\u2019s what helped us the most: Be explicit in your WHERE clauses. Match your index structure to query patterns. Don\u2019t forget foreign keys, vacuums, and planner stats.",
-    "total_ms": 6315,
-    "search_ms": 839,
-    "extract_ms": 5476,
+    "output": "## Result 1 (score: 1.0)\n**Optimizing SQL Indexes in PostgreSQL and MySQL - Rapydo**\nhttps://www.rapydo.io/blog/optimizing-sql-indexes-in-postgresql-and-mysql\n\n[snippet] Jul 9, 2025 ... SQL indexing best practices, PostgreSQL indexes, MySQL indexes, index optimization, Rapydo AI, database performance tuning,\u00a0...\n\n---\n\n## Result 2 (score: 0.8506)\n**PostgreSQL Tuning: Database Indexes | Tiger Data**\nhttps://www.tigerdata.com/learn/postgresql-performance-tuning-optimizing-database-indexes\n\n, play a crucial role in optimizing indexes in a PostgreSQL database, so with best practices, you can get serious results. The `ANALYZE`\n\nAn efficient PostgreSQL indexing is a potent ally for fine-tuning data retrieval within your applications. Indexing is a balancing act, but creating the appropriate indexes and maintaining them will significantly enhance the overall performance of your PostgreSQL database.\n\n---\n\n## Result 3 (score: 0.535)\n**Some indexing best practices - pgMustard**\nhttps://www.pgmustard.com/blog/indexing-best-practices-postgresql\n\nWe all know that indexing is important, but it can be difficult to know where to start. In this post, my aim is to collate some of the best advice I\u2019ve seen for indexing Postgres, and simplify it for folks just getting started.\n\n---\n\n## Result 4 (score: 0.4246)\n**Indexing in PostgreSQL: Pros, Cons, and Best Practices**\nhttps://dev.to/mspilari/understanding-indexing-in-postgresql-pros-cons-and-best-practices-41p4\n\nIndexing is a powerful tool in PostgreSQL that can significantly improve query performance. However, it should be used judiciously, as excessive indexing can slow down insert, update, and delete operations. By understanding the different types of indexes and their appropriate use cases, you can optimize your database for efficiency and speed.\n\n---\n\n## Result 5 (score: 0.2958)\n**A Practical Guide to PostgreSQL Indexes**\nhttps://www.percona.com/blog/a-practical-guide-to-postgresql-indexes/\n\nThis blog aims to provide a comprehensive resource for understanding and optimizing indexes in PostgreSQL. It covers the different index types, their use cases, and performance implications. By the end, you\u2019ll be equipped to utilize indexes strategically and significantly improve query performance and overall database efficiency.",
+    "total_ms": 3696,
+    "search_ms": 487,
+    "extract_ms": 3208,
     "num_results": 5,
-    "total_chars": 2478,
-    "est_tokens": 620,
+    "total_chars": 2291,
+    "est_tokens": 573,
     "results": [
       {
-        "title": "Mastering Indexes in PostgreSQL: A Real-World Guide",
-        "url": "https://thinhdanggroup.github.io/indexing-mistakes/",
-        "chars": 310
-      },
-      {
-        "title": "How to Create Effective Indexes in PostgreSQL",
-        "url": "https://oneuptime.com/blog/post/2026-01-21-postgresql-indexes/view",
-        "chars": 240
-      },
-      {
-        "title": "Why Your PostgreSQL Indexes Might Be Hurting You (and How to Fix Them) | Timescale",
-        "url": "https://medium.com/timescale/why-your-postgresql-indexes-might-be-hurting-you-and-how-to-fix-them-a8511ebc4779",
-        "chars": 358
+        "title": "Optimizing SQL Indexes in PostgreSQL and MySQL - Rapydo",
+        "url": "https://www.rapydo.io/blog/optimizing-sql-indexes-in-postgresql-and-mysql",
+        "chars": 153
       },
       {
         "title": "PostgreSQL Tuning: Database Indexes | Tiger Data",
@@ -104,58 +94,68 @@
         "chars": 411
       },
       {
-        "title": "Optimizing PostgreSQL queries: 12 indexing pitfalls and how we fixed them | Cubbit",
-        "url": "https://medium.com/cubbit/optimizing-postgresql-queries-12-indexing-pitfalls-and-how-we-fixed-them-81c25615a84e",
-        "chars": 225
+        "title": "Some indexing best practices - pgMustard",
+        "url": "https://www.pgmustard.com/blog/indexing-best-practices-postgresql",
+        "chars": 227
+      },
+      {
+        "title": "Indexing in PostgreSQL: Pros, Cons, and Best Practices",
+        "url": "https://dev.to/mspilari/understanding-indexing-in-postgresql-pros-cons-and-best-practices-41p4",
+        "chars": 344
+      },
+      {
+        "title": "A Practical Guide to PostgreSQL Indexes",
+        "url": "https://www.percona.com/blog/a-practical-guide-to-postgresql-indexes/",
+        "chars": 331
       }
     ]
   },
   {
     "query": "how to set up a SearXNG instance",
-    "output": "## Result 1 (score: 1.0)\n**r/Searx on Reddit: Is there any dummy guide on how to set up your own instance of SearX/SearXNG with little coding experience? Will I also be able to use it on android?**\nhttps://www.reddit.com/r/Searx/comments/18n842h/is_there_any_dummy_guide_on_how_to_set_up_your/\n\n[snippet] Dec 20, 2023 ... Is there any dummy guide on how to set up your own instance of SearX/SearXNG with little coding experience? Will I also be able to use it on android?\n\n---\n\n## Result 2 (score: 0.5548)\n**Welcome to SearXNG\u00b6**\nhttps://docs.searxng.org/\n\n# Welcome to SearXNG[\u00b6](https://docs.searxng.org#welcome-to-searxng)\n\nSearch without being tracked.\n\nGet started with SearXNG by using one of the instances listed at [searx.space](https://searx.space).\nIf you don\u2019t trust anyone, you can set up your own, see [Installation](https://docs.searxng.org/admin/installation.html#installation).\n\n## Acknowledgements[\u00b6](https://docs.searxng.org#acknowledgements)\n\nThe following organizations have provided SearXNG access to their paid plans at no cost:\n\n|\n\n---\n\n## Result 3 (score: 0.3569)\n**Step by step installation\u00b6**\nhttps://docs.searxng.org/admin/installation-searxng.html\n\n# Step by step installation[\u00b6](https://docs.searxng.org#step-by-step-installation)\n\nIn this section we show the setup of a SearXNG instance that will be installed\nby the [Installation Script](https://docs.searxng.org/installation-scripts.html#installation-scripts).\n\n[Configuration](https://docs.searxng.org#id5)[\u00b6](https://docs.searxng.org#configuration)\n\nTo check your SearXNG setup, optional enable debugging and start the *webapp*.\nSearXNG looks at the exported environment `$SEARXNG_SETTINGS_PATH`\n\n---\n\n## Result 4 (score: 0.356)\n**SearXNG | Open WebUI**\nhttps://docs.openwebui.com/features/chat-conversations/web-search/providers/searxng/\n\n, which will contain your SearXNG configuration files. Refer to the [SearXNG documentation](https://docs.searxng.org/) for configuration instructions.\n\nThe searXNG will be available at [http://localhost:8080](http://localhost:8080) (or the port number you set earlier).\n\nCreate a `.env`\n\nfile for SearXNG:\n\n`# SearXNG`\n\nSEARXNG_HOSTNAME=localhost:8080/\n\nfile for the `searxng`\n\nservice to successfully create `/etc/searxng/uwsgi.ini`\n\n---\n\n## Result 5 (score: 0.3119)\n**Installation\u00b6**\nhttps://docs.searxng.org/admin/installation.html\n\nThe [Step by step installation](https://docs.searxng.org/installation-searxng.html#installation-basic) is an excellent illustration of *how a SearXNG\ninstance is build up* (see [uWSGI Setup](https://docs.searxng.org/architecture.html#architecture-uwsgi)). If you do not have any\nspecial preferences, it\u2019s recommended to use the [Installation container](https://docs.searxng.org/installation-docker.html#installation-container) or the\n[Installation Script](https://docs.searxng.org/installation-scripts.html#installation-scripts).",
-    "total_ms": 5592,
-    "search_ms": 851,
-    "extract_ms": 4740,
+    "output": "## Result 1 (score: 1.0)\n**r/Searx on Reddit: Is there any dummy guide on how to set up your ...**\nhttps://www.reddit.com/r/Searx/comments/18n842h/is_there_any_dummy_guide_on_how_to_set_up_your/\n\n[snippet] Dec 20, 2023 ... Is there any dummy guide on how to set up your own instance of SearX/SearXNG with little coding experience? Will I also be able to use it on android?\n\n---\n\n## Result 2 (score: 0.7574)\n**SearXNG: Your Private Search Engine - Docker Tutorial - YouTube**\nhttps://www.youtube.com/watch?v=UBLypfM9U-g\n\n[snippet] Oct 23, 2024 ... back your privacy with SearxNG! In this Docker tutorial, we'll set up a self-hosted SearxNG instance that gives you the freedom to search\u00a0...\n\n---\n\n## Result 3 (score: 0.247)\n**GitHub - searxng/searxng-docker: The docker-compose files for setting up a SearXNG instance with docker.**\nhttps://github.com/searxng/searxng-docker\n\nCreate a new SearXNG instance in five minutes using Docker\n\n[Install docker](https://docs.docker.com/install/)- Get searxng-docker\n\n- Edit\n[searxng/settings.yml](https://github.com/searxng/searxng-docker/blob/master/searxng/settings.yml)according to your needs\n\nsuch as the caddy service and its volumes. - Point your reverse proxy to the port set for the\n`searxng`\n\n) -\nEnable the service:\n\nsystemctl enable $(pwd)/searxng-docker.service\n\n-\nStart the service:\n\n---\n\n## Result 4 (score: 0.1266)\n**Private, self-hosted search with SearXNG**\nhttps://www.youtube.com/watch?v=wcYSx2ad4XI\n\nAbout\nPress\nCopyright\nContact us\nCreators\nAdvertise\nDevelopers\nTerms\nPrivacy\nPolicy & Safety\nHow YouTube works\nTest new features\nNFL Sunday Ticket\n\u00a9 2026 Google LLC\n\n---\n\n## Result 5 (score: 0.1228)\n**Building a Private Search Engine: SearXNG + AWS Guide - Medium**\nhttps://medium.com/@areebahmeddd/building-a-private-search-engine-searxng-aws-guide-7b348742e818\n\n[snippet] Jan 10, 2025 ... Step 1: Create an EC2 Instance on AWS \u00b7 Step 2: Connect to Your Instance \u00b7 Step 3: Install Docker and SearXNG \u00b7 Step 4: Test Your Search Engine.",
+    "total_ms": 3472,
+    "search_ms": 382,
+    "extract_ms": 3088,
     "num_results": 5,
-    "total_chars": 2889,
-    "est_tokens": 722,
+    "total_chars": 1994,
+    "est_tokens": 498,
     "results": [
       {
-        "title": "r/Searx on Reddit: Is there any dummy guide on how to set up your own instance of SearX/SearXNG with little coding experience? Will I also be able to use it on android?",
+        "title": "r/Searx on Reddit: Is there any dummy guide on how to set up your ...",
         "url": "https://www.reddit.com/r/Searx/comments/18n842h/is_there_any_dummy_guide_on_how_to_set_up_your/",
         "chars": 176
       },
       {
-        "title": "Welcome to SearXNG\u00b6",
-        "url": "https://docs.searxng.org/",
-        "chars": 496
+        "title": "SearXNG: Your Private Search Engine - Docker Tutorial - YouTube",
+        "url": "https://www.youtube.com/watch?v=UBLypfM9U-g",
+        "chars": 168
       },
       {
-        "title": "Step by step installation\u00b6",
-        "url": "https://docs.searxng.org/admin/installation-searxng.html",
-        "chars": 502
+        "title": "GitHub - searxng/searxng-docker: The docker-compose files for setting up a SearXNG instance with docker.",
+        "url": "https://github.com/searxng/searxng-docker",
+        "chars": 460
       },
       {
-        "title": "SearXNG | Open WebUI",
-        "url": "https://docs.openwebui.com/features/chat-conversations/web-search/providers/searxng/",
-        "chars": 433
+        "title": "Private, self-hosted search with SearXNG",
+        "url": "https://www.youtube.com/watch?v=wcYSx2ad4XI",
+        "chars": 164
       },
       {
-        "title": "Installation\u00b6",
-        "url": "https://docs.searxng.org/admin/installation.html",
-        "chars": 529
+        "title": "Building a Private Search Engine: SearXNG + AWS Guide - Medium",
+        "url": "https://medium.com/@areebahmeddd/building-a-private-search-engine-searxng-aws-guide-7b348742e818",
+        "chars": 171
       }
     ]
   },
   {
     "query": "transformer architecture attention mechanism explained",
-    "output": "## Result 1 (score: 1.0)\n**Transformer Architecture Explained With Self-Attention Mechanism | Codecademy**\nhttps://www.codecademy.com/article/transformer-architecture-self-attention-mechanism\n\n# Transformer Architecture Explained With Self-Attention Mechanism\n\nThe first transformer architecture was introduced in the paper \u201c[Attention Is All You Need](https://en.wikipedia.org/wiki/Attention_Is_All_You_Need). It was designed to translate text from one language to another and looks as follows:\n\n---\n\n## Result 2 (score: 0.3783)\n**The Transformer Attention Mechanism - MachineLearningMastery.com**\nhttps://www.machinelearningmastery.com/the-transformer-attention-mechanism/\n\n[snippet] Jan 6, 2023 ... The Transformer architecture revolutionized the use of attention by dispensing with recurrence and convolutions, on which the formers had\u00a0...\n\n---\n\n## Result 3 (score: 0.2522)\n**How Transformers Work: A Detailed Exploration of Transformer Architecture | DataCamp**\nhttps://www.datacamp.com/tutorial/how-transformers-work\n\n[snippet] Since the original 2017 architecture, Transformers have evolved significantly to address limitations and expand to new domains. Vision Transformers apply the self-attention mechanism to images by dividing them into patches and treating each patch as a token.\n\n---\n\n## Result 4 (score: 0.1064)\n**What is an attention mechanism? | IBM**\nhttps://www.ibm.com/think/topics/attention-mechanism\n\nThe attention mechanism\u2019s primary function is to weight the importance of the query-key pairings between each token. For each token *x* in an input sequence, the transformer model computes (and then applies) attention weights as follows:\n\n---\n\n## Result 5 (score: 0.0735)\n**11. Attention Mechanisms and Transformers\u00b6**\nhttp://d2l.ai/chapter_attention-mechanisms-and-transformers/index.html\n\nIn this chapter, we introduce attention models, starting with the most basic intuitions and the simplest instantiations of the idea. We then work our way up to the Transformer architecture, the vision Transformer, and the landscape of modern Transformer-based pretrained models.",
-    "total_ms": 6772,
-    "search_ms": 980,
-    "extract_ms": 5791,
+    "output": "## Result 1 (score: 1.0)\n**Transformer Architecture Explained With Self-Attention Mechanism | Codecademy**\nhttps://www.codecademy.com/article/transformer-architecture-self-attention-mechanism\n\n# Transformer Architecture Explained With Self-Attention Mechanism\n\nThe first transformer architecture was introduced in the paper \u201c[Attention Is All You Need](https://en.wikipedia.org/wiki/Attention_Is_All_You_Need). It was designed to translate text from one language to another and looks as follows:\n\n---\n\n## Result 2 (score: 0.3349)\n**%%title%% : A Comprehensive Guide - GeeksforGeeks**\nhttps://www.geeksforgeeks.org/nlp/transformer-attention-mechanism-in-nlp/\n\nThe attention mechanism in Transformers offers several advantages:\n\n---\n\n## Result 3 (score: 0.278)\n**Attention in transformers, step-by-step | Deep Learning Chapter 6**\nhttps://www.youtube.com/watch?v=eMlx5fFNoYc\n\n[snippet] Apr 7, 2024 ... Demystifying attention, the key mechanism inside transformers and ... meaning: https://arxiv.org/pdf/1301.3781.pdf\u00a0...\n\n---\n\n## Result 4 (score: 0.2415)\n**The Transformer Attention Mechanism - MachineLearningMastery.com**\nhttps://www.machinelearningmastery.com/the-transformer-attention-mechanism/\n\n[snippet] Jan 6, 2023 ... The Transformer architecture revolutionized the use of attention by dispensing with recurrence and convolutions, on which the formers had\u00a0...\n\n---\n\n## Result 5 (score: 0.2415)\n**Transformer (deep learning) - Wikipedia**\nhttps://en.wikipedia.org/wiki/Transformer_(deep_learning)\n\n[snippet] In deep learning, the transformer is an artificial neural network architecture based on the multi-head attention mechanism, in which text is converted to\u00a0...",
+    "total_ms": 4720,
+    "search_ms": 528,
+    "extract_ms": 4191,
     "num_results": 5,
-    "total_chars": 2092,
-    "est_tokens": 523,
+    "total_chars": 1671,
+    "est_tokens": 418,
     "results": [
       {
         "title": "Transformer Architecture Explained With Self-Attention Mechanism | Codecademy",
@@ -163,24 +163,24 @@
         "chars": 302
       },
       {
+        "title": "%%title%% : A Comprehensive Guide - GeeksforGeeks",
+        "url": "https://www.geeksforgeeks.org/nlp/transformer-attention-mechanism-in-nlp/",
+        "chars": 66
+      },
+      {
+        "title": "Attention in transformers, step-by-step | Deep Learning Chapter 6",
+        "url": "https://www.youtube.com/watch?v=eMlx5fFNoYc",
+        "chars": 144
+      },
+      {
         "title": "The Transformer Attention Mechanism - MachineLearningMastery.com",
         "url": "https://www.machinelearningmastery.com/the-transformer-attention-mechanism/",
         "chars": 167
       },
       {
-        "title": "How Transformers Work: A Detailed Exploration of Transformer Architecture | DataCamp",
-        "url": "https://www.datacamp.com/tutorial/how-transformers-work",
-        "chars": 268
-      },
-      {
-        "title": "What is an attention mechanism? | IBM",
-        "url": "https://www.ibm.com/think/topics/attention-mechanism",
-        "chars": 237
-      },
-      {
-        "title": "11. Attention Mechanisms and Transformers\u00b6",
-        "url": "http://d2l.ai/chapter_attention-mechanisms-and-transformers/index.html",
-        "chars": 278
+        "title": "Transformer (deep learning) - Wikipedia",
+        "url": "https://en.wikipedia.org/wiki/Transformer_(deep_learning)",
+        "chars": 167
       }
     ]
   }

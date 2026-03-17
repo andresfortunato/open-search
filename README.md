@@ -20,8 +20,8 @@ Head-to-head comparison across 5 diverse queries (technical, scientific, how-to)
 
 | Metric | open-search-mcp | WebSearch | WebSearch+WebFetch |
 |--------|----------------|-----------|-------------------|
-| Latency | 6.3s | ~3s | ~6-10s (multi-call) |
-| Tokens/query | **667** | ~650 | ~1,300+ |
+| Latency | **4.1s** | ~3s | ~6-10s (multi-call) |
+| Tokens/query | **535** | ~650 | ~1,300+ |
 | Tool calls | **1** | 1 | 3-6 |
 | Content fidelity | **Verbatim excerpts** | AI-rewritten | AI-summarized |
 | Extraction success | **76%** (90%+ with browser) | N/A | 50% |
@@ -46,34 +46,39 @@ open-search-mcp uses [SearXNG](https://docs.searxng.org/) as its search backend.
 - **Stopping:** Run `docker compose down` in the project directory to stop containers.
 - **Volume:** SearXNG settings are mounted read-only. No host files are created or modified by the containers.
 
-## Install from GitHub
+## Install
+
+### One-command install (no clone needed)
 
 ```bash
-# Clone the repo
-git clone https://github.com/open-search-mcp/open-search-mcp.git
-cd open-search-mcp
+claude mcp add open-search -- uvx --from git+https://github.com/andresfortunato/open-search.git open-search-mcp
+```
 
-# Install with uv (recommended)
-uv venv && uv pip install -e .
+That's it. Claude Code will run `uvx` to fetch and start the server on demand.
 
-# Optional: browser fallback for JS-rendered pages (Reddit, Medium, etc.)
-uv pip install -e ".[browser]"
+### With Playwright (recommended — improves extraction from 76% to ~100%)
+
+```bash
+# Clone for browser support (uvx doesn't support extras yet)
+git clone https://github.com/andresfortunato/open-search.git
+cd open-search
+uv venv && uv pip install -e ".[browser]"
 playwright install chromium
+
+# Add to Claude Code
+claude mcp add open-search -- $(pwd)/.venv/bin/open-search-mcp
 ```
 
-### Add to Claude Code
+### Manual config
 
-```bash
-claude mcp add open-search -- /path/to/open-search-mcp/.venv/bin/open-search-mcp
-```
-
-Or manually add to `~/.claude.json`:
+Add to `~/.claude.json`:
 
 ```json
 {
   "mcpServers": {
     "open-search": {
-      "command": "/path/to/open-search-mcp/.venv/bin/open-search-mcp"
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/andresfortunato/open-search.git", "open-search-mcp"]
     }
   }
 }

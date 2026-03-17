@@ -43,7 +43,7 @@ async def run_query(client: httpx.AsyncClient, query: str) -> dict:
 
     # Fetch + extract + chunk
     t_extract = time.perf_counter()
-    extracted = await fetch_and_extract(client, urls, query=query)
+    extracted = await fetch_and_extract(client, urls, query=query, max_results=MAX_RESULTS)
     extract_ms = (time.perf_counter() - t_extract) * 1000
 
     # Snippet fallback

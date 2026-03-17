@@ -33,7 +33,7 @@ async def test_early_return_when_enough_results(mock_client):
 
     call_count = 0
 
-    async def mock_get(url):
+    async def mock_get(url, **kwargs):
         nonlocal call_count
         call_count += 1
         resp = MagicMock()
@@ -66,7 +66,7 @@ async def test_returns_fewer_when_not_enough_succeed(mock_client):
     urls = [f"https://example.com/page{i}" for i in range(5)]
     content = "This is substantial content for testing extraction quality. " * 5
 
-    async def mock_get(url):
+    async def mock_get(url, **kwargs):
         resp = MagicMock()
         if "page0" in url or "page1" in url:
             resp.status_code = 200
@@ -97,7 +97,7 @@ async def test_all_urls_fail_returns_empty(mock_client):
 
     urls = ["https://example.com/bad1", "https://example.com/bad2"]
 
-    async def mock_get(url):
+    async def mock_get(url, **kwargs):
         raise httpx.ConnectError("Connection refused")
 
     mock_client.get = mock_get
@@ -120,7 +120,7 @@ async def test_skips_playwright_when_enough_results(mock_client):
     urls = [f"https://example.com/page{i}" for i in range(6)]
     content = "This is substantial content for testing extraction quality. " * 5
 
-    async def mock_get(url):
+    async def mock_get(url, **kwargs):
         resp = MagicMock()
         resp.status_code = 200
         resp.text = _make_html("Good Page", content)
@@ -152,7 +152,7 @@ async def test_chunk_selection_applied_with_query(mock_client):
     long_content = ("Python is a great programming language for web development. " * 30 +
                     "Rate limiting protects APIs from abuse. " * 20)
 
-    async def mock_get(url):
+    async def mock_get(url, **kwargs):
         resp = MagicMock()
         resp.status_code = 200
         resp.text = _make_html("Rate Limiting Guide", long_content)
@@ -185,7 +185,7 @@ async def test_cache_hit_avoids_refetch(mock_client):
 
     fetch_count = 0
 
-    async def mock_get(url):
+    async def mock_get(url, **kwargs):
         nonlocal fetch_count
         fetch_count += 1
         resp = MagicMock()
@@ -220,7 +220,7 @@ async def test_fetched_urls_get_cached(mock_client):
     cache = URLCache(ttl_seconds=300)
     content = "This is substantial content for testing extraction quality. " * 5
 
-    async def mock_get(url):
+    async def mock_get(url, **kwargs):
         resp = MagicMock()
         resp.status_code = 200
         resp.text = _make_html("Page Title", content)

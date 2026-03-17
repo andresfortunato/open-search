@@ -6,6 +6,7 @@ Install with: pip install open-search-mcp[browser]
 
 import asyncio
 import logging
+import random
 
 import httpx
 import trafilatura
@@ -19,6 +20,15 @@ DEFAULT_TIMEOUT = 8.0
 MAX_CONCURRENT = 5
 MAX_CONTENT_LENGTH = 20_000
 TARGET_CHUNK_CHARS = 500
+
+# Rotate User-Agent to reduce 403s from sites that block bots
+_USER_AGENTS = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:133.0) Gecko/20100101 Firefox/133.0",
+]
 
 # Playwright is optional — detected at import time
 _playwright_available = False
@@ -184,7 +194,8 @@ async def fetch_and_extract(
         """Fetch one URL, extract content. Returns result dict or None."""
         async with semaphore:
             try:
-                resp = await client.get(url)
+                headers = {"User-Agent": random.choice(_USER_AGENTS)}
+                resp = await client.get(url, headers=headers)
                 resp.raise_for_status()
                 html = resp.text
             except Exception as e:
