@@ -43,3 +43,6 @@ package-dir = {"" = "src"}
 [project.urls]
 Homepage = "https://github.com/open-search-mcp/open-search-mcp"
 Repository = "https://github.com/open-search-mcp/open-search-mcp"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

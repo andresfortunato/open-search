@@ -126,10 +126,12 @@ async def search(
     urls = [r["url"] for r in search_results]
 
     # Step 2: Fetch and extract content concurrently (with chunk selection)
+    # Pass max_results so fetch_and_extract can return early once enough pages succeed
     extracted = await fetch_and_extract(
         client=client,
         urls=urls,
         query=query,
+        max_results=max_results,
         max_concurrent=MAX_CONCURRENT,
         max_length=MAX_CONTENT_LENGTH,
     )

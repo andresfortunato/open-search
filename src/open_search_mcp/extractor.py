@@ -142,45 +142,73 @@ async def fetch_and_extract(
     client: httpx.AsyncClient,
     urls: list[str],
     query: str | None = None,
+    max_results: int | None = None,
     max_concurrent: int = MAX_CONCURRENT,
     max_length: int = MAX_CONTENT_LENGTH,
     target_chars: int = TARGET_CHUNK_CHARS,
 ) -> list[dict]:
-    """Fetch URLs and extract content concurrently.
+    """Fetch URLs and extract content concurrently with early return.
 
     Returns list of {"url": str, "title": str, "content": str}.
-    Failed URLs are silently skipped. When query is provided, content is
+    Processes pages as fetches complete. Stops collecting once max_results
+    pages are successfully extracted. When query is provided, content is
     reduced to the most query-relevant chunks via embeddings.
     """
-    html_map = await fetch_many(client, urls, max_concurrent)
+    target_count = max_results if max_results else len(urls)
+    semaphore = asyncio.Semaphore(max_concurrent)
 
-    # Extract content concurrently via thread pool
-    extract_tasks = []
-    for url, html in html_map.items():
-        if html is not None:
-            extract_tasks.append((url, extract_content_async(html, url, max_length)))
+    # Launch all fetches as tasks
+    async def fetch_and_process(url: str) -> dict | None:
+        """Fetch one URL, extract content. Returns result dict or None."""
+        async with semaphore:
+            try:
+                resp = await client.get(url)
+                resp.raise_for_status()
+                html = resp.text
+            except Exception as e:
+                logger.warning("Failed to fetch %s: %s", url, e)
+                return None
 
+        extracted = await extract_content_async(html, url, max_length)
+        if not extracted:
+            return None
+        return {"url": url, **extracted}
+
+    # Create all tasks and process as they complete
+    tasks = {asyncio.ensure_future(fetch_and_process(url)): url for url in urls}
     results = []
     failed_urls = []
-    for url, task in extract_tasks:
-        extracted = await task
-        if extracted:
-            results.append({"url": url, **extracted})
-        else:
-            failed_urls.append(url)
 
-    # Also collect URLs that httpx couldn't fetch at all
-    for url in urls:
-        if url not in html_map or html_map[url] is None:
+    for coro in asyncio.as_completed(tasks.keys()):
+        result = await coro
+        if result:
+            results.append(result)
+            if len(results) >= target_count:
+                break
+        else:
+            # Find which URL this task was for
+            for task, url in tasks.items():
+                if task.done() and task.result() is None:
+                    if url not in [r["url"] for r in results] and url not in failed_urls:
+                        failed_urls.append(url)
+
+    # Cancel remaining tasks if we got enough
+    for task in tasks:
+        if not task.done():
+            task.cancel()
+            # Track cancelled URLs as failed
+            url = tasks[task]
             if url not in failed_urls:
                 failed_urls.append(url)
 
-    # Playwright fallback for failed URLs (JS-rendered pages, 403s)
-    if failed_urls and _playwright_available:
-        logger.info("Retrying %d URLs with Playwright...", len(failed_urls))
-        pw_html = await fetch_with_playwright(failed_urls)
+    # Playwright fallback — only if we don't have enough results
+    if len(results) < target_count and failed_urls and _playwright_available:
+        needed = target_count - len(results)
+        retry_urls = failed_urls[:needed * 2]  # try up to 2x what we need
+        logger.info("Retrying %d URLs with Playwright...", len(retry_urls))
+        pw_html = await fetch_with_playwright(retry_urls)
         for url, html in pw_html.items():
-            if html:
+            if html and len(results) < target_count:
                 extracted = await extract_content_async(html, url, max_length)
                 if extracted:
                     results.append({"url": url, **extracted})
