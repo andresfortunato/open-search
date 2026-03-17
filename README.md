@@ -1,4 +1,4 @@
-# open-search-mcp
+# Open Search MCP
 
 Open source MCP search server for Claude Code. Replaces WebSearch + WebFetch with a single tool call that returns verbatim, query-relevant excerpts.
 
@@ -54,7 +54,7 @@ claude mcp add open-search -- uvx --from git+https://github.com/andresfortunato/
 
 That's it. Claude Code will run `uvx` to fetch and start the server on demand.
 
-**Optional: install Chromium for ~100% extraction success** (vs 76% without):
+**Recommended: install Chromium for ~100% extraction success** (vs 76% without):
 
 ```bash
 playwright install chromium
