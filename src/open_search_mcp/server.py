@@ -8,6 +8,7 @@ import subprocess
 import time
 from contextlib import asynccontextmanager
 from pathlib import Path
+from urllib.parse import urlparse
 
 import httpx
 from mcp.server.fastmcp import FastMCP, Context
@@ -27,6 +28,11 @@ MAX_CONTENT_LENGTH = int(os.environ.get("MAX_CONTENT_LENGTH", "20000"))
 MAX_CONCURRENT = min(int(os.environ.get("MAX_CONCURRENT_FETCHES", "5")), 20)
 DEBUG = os.environ.get("OPEN_SEARCH_DEBUG", "").lower() in ("1", "true", "yes")
 
+# Validate SEARXNG_URL at import time
+_parsed_searxng = urlparse(SEARXNG_URL)
+if _parsed_searxng.scheme not in ("http", "https") or not _parsed_searxng.hostname:
+    raise RuntimeError(f"Invalid SEARXNG_URL: {SEARXNG_URL!r} — must be http(s)://hostname[:port]")
+
 # docker-compose.yml lives at repo root (two levels up from this file in src layout)
 COMPOSE_DIR = os.environ.get(
     "OPEN_SEARCH_COMPOSE_DIR",
@@ -35,16 +41,22 @@ COMPOSE_DIR = os.environ.get(
 
 
 def _ensure_searxng_secret_key() -> None:
-    """Generate a random secret key in settings.yml on first run."""
-    settings_path = Path(COMPOSE_DIR) / "searxng" / "settings.yml"
-    if not settings_path.exists():
-        return
-    content = settings_path.read_text()
-    if "REPLACE_ME_ON_FIRST_RUN" in content:
-        new_key = secrets.token_hex(32)
-        content = content.replace("REPLACE_ME_ON_FIRST_RUN", new_key)
-        settings_path.write_text(content)
-        logger.info("Generated SearXNG secret key.")
+    """Generate settings.yml from template with a random secret key on first run."""
+    compose_dir = Path(COMPOSE_DIR)
+    settings_path = compose_dir / "searxng" / "settings.yml"
+    template_path = compose_dir / "searxng" / "settings.yml.template"
+
+    if settings_path.exists():
+        return  # Already generated
+
+    if not template_path.exists():
+        return  # No template available (e.g., uvx install without clone)
+
+    content = template_path.read_text()
+    new_key = secrets.token_hex(32)
+    content = content.replace("REPLACE_ME_ON_FIRST_RUN", new_key)
+    settings_path.write_text(content)
+    logger.info("Generated SearXNG settings.yml with random secret key.")
 
 
 async def _ensure_searxng_running() -> None:

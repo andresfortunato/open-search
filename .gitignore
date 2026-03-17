@@ -8,3 +8,4 @@ build/
 uv.lock
 .env
 node_modules/
+searxng/settings.yml
