@@ -8,13 +8,11 @@ from rank_bm25 import BM25Okapi
 
 logger = logging.getLogger(__name__)
 
-SEARXNG_URL = "http://localhost:8888"
-
 
 async def search_searxng(
     client: httpx.AsyncClient,
     query: str,
-    searxng_url: str = SEARXNG_URL,
+    searxng_url: str,
     max_results: int = 10,
     include_domains: list[str] | None = None,
     exclude_domains: list[str] | None = None,

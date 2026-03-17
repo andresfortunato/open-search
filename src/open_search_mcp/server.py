@@ -14,7 +14,7 @@ from mcp.server.fastmcp import FastMCP, Context
 
 from .searcher import search_searxng, score_with_bm25
 from .cache import URLCache
-from .extractor import fetch_and_extract
+from .extractor import fetch_and_extract, PlaywrightBrowser
 from .chunker import _get_model
 
 logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 SEARXNG_URL = os.environ.get("SEARXNG_URL", "http://localhost:8888")
 FETCH_TIMEOUT = float(os.environ.get("FETCH_TIMEOUT", "4"))
 MAX_CONTENT_LENGTH = int(os.environ.get("MAX_CONTENT_LENGTH", "20000"))
-MAX_CONCURRENT = int(os.environ.get("MAX_CONCURRENT_FETCHES", "5"))
+MAX_CONCURRENT = min(int(os.environ.get("MAX_CONCURRENT_FETCHES", "5")), 20)
 DEBUG = os.environ.get("OPEN_SEARCH_DEBUG", "").lower() in ("1", "true", "yes")
 
 # docker-compose.yml lives at repo root (two levels up from this file in src layout)
@@ -94,6 +94,8 @@ async def app_lifespan(server: FastMCP):
     logger.warning("[open-search] Model ready.")
 
     url_cache = URLCache(ttl_seconds=300)
+    pw_browser = PlaywrightBrowser()
+    await pw_browser.start()
 
     async with httpx.AsyncClient(
         follow_redirects=True,
@@ -101,7 +103,9 @@ async def app_lifespan(server: FastMCP):
         headers={"User-Agent": "search-mcp/0.1 (content extraction for LLMs)"},
         limits=httpx.Limits(max_connections=20, max_keepalive_connections=10),
     ) as client:
-        yield {"http_client": client, "url_cache": url_cache}
+        yield {"http_client": client, "url_cache": url_cache, "pw_browser": pw_browser}
+
+    await pw_browser.stop()
 
 
 async def _search_with_recovery(
@@ -175,6 +179,7 @@ async def search(
     lifespan_ctx = ctx.request_context.lifespan_context
     client: httpx.AsyncClient = lifespan_ctx["http_client"]
     url_cache: URLCache = lifespan_ctx["url_cache"]
+    pw_browser: PlaywrightBrowser = lifespan_ctx["pw_browser"]
 
     t_start = time.perf_counter()
 
@@ -208,6 +213,7 @@ async def search(
         query=query,
         max_results=max_results,
         cache=url_cache,
+        browser=pw_browser,
         max_concurrent=MAX_CONCURRENT,
         max_length=MAX_CONTENT_LENGTH,
     )
@@ -278,12 +284,14 @@ async def extract(
     lifespan_ctx = ctx.request_context.lifespan_context
     client: httpx.AsyncClient = lifespan_ctx["http_client"]
     url_cache: URLCache = lifespan_ctx["url_cache"]
+    pw_browser: PlaywrightBrowser = lifespan_ctx["pw_browser"]
 
     extracted = await fetch_and_extract(
         client=client,
         urls=urls,
         query=query,
         cache=url_cache,
+        browser=pw_browser,
         max_concurrent=MAX_CONCURRENT,
         max_length=MAX_CONTENT_LENGTH,
     )
@@ -306,7 +314,7 @@ async def extract(
     return "\n\n---\n\n".join(parts)
 
 
-def main():
+def main() -> None:
     mcp.run(transport="stdio")
 
 

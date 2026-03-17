@@ -1,6 +1,6 @@
 # open-search-mcp
 
-Open source MCP search server for Claude Code. Replaces WebSearch + WebFetch with a single tool call that returns verbatim, query-relevant excerpts from real web pages.
+Open source MCP search server for Claude Code. Replaces WebSearch + WebFetch with a single tool call that returns verbatim, query-relevant excerpts.
 
 ## Why?
 
@@ -48,7 +48,7 @@ open-search-mcp uses [SearXNG](https://docs.searxng.org/) as its search backend.
 
 ## Install
 
-### One-command install (no clone needed)
+ One-command install:
 
 ```bash
 claude mcp add open-search -- uvx --from git+https://github.com/andresfortunato/open-search.git open-search-mcp
@@ -56,7 +56,7 @@ claude mcp add open-search -- uvx --from git+https://github.com/andresfortunato/
 
 That's it. Claude Code will run `uvx` to fetch and start the server on demand.
 
-### With Playwright (recommended — improves extraction from 76% to ~100%)
+ With Playwright (recommended — improves extraction from 76% to ~100%):
 
 ```bash
 # Clone for browser support (uvx doesn't support extras yet)

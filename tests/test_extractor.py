@@ -1,6 +1,5 @@
 """Tests for extractor module — stream processing, early return, and caching."""
 
-import asyncio
 from unittest.mock import AsyncMock, patch, MagicMock
 
 from open_search_mcp.cache import URLCache
@@ -40,6 +39,7 @@ async def test_early_return_when_enough_results(mock_client):
         resp.status_code = 200
         resp.text = _make_html(f"Page {call_count}", fast_content)
         resp.raise_for_status = MagicMock()
+        resp.headers = {}
         return resp
 
     mock_client.get = mock_get
@@ -115,7 +115,7 @@ async def test_all_urls_fail_returns_empty(mock_client):
 @pytest.mark.asyncio
 async def test_skips_playwright_when_enough_results(mock_client):
     """Playwright fallback is NOT called when we already have enough results."""
-    from open_search_mcp.extractor import fetch_and_extract
+    from open_search_mcp.extractor import fetch_and_extract, PlaywrightBrowser
 
     urls = [f"https://example.com/page{i}" for i in range(6)]
     content = "This is substantial content for testing extraction quality. " * 5
@@ -125,21 +125,25 @@ async def test_skips_playwright_when_enough_results(mock_client):
         resp.status_code = 200
         resp.text = _make_html("Good Page", content)
         resp.raise_for_status = MagicMock()
+        resp.headers = {}
         return resp
 
     mock_client.get = mock_get
 
-    with patch("open_search_mcp.extractor._playwright_available", True), \
-         patch("open_search_mcp.extractor.fetch_with_playwright") as pw_mock:
-        results = await fetch_and_extract(
-            client=mock_client,
-            urls=urls,
-            max_results=3,
-        )
+    mock_browser = MagicMock(spec=PlaywrightBrowser)
+    mock_browser.available = True
+    mock_browser.fetch = AsyncMock(return_value={})
+
+    results = await fetch_and_extract(
+        client=mock_client,
+        urls=urls,
+        max_results=3,
+        browser=mock_browser,
+    )
 
     # Should have 3 results and Playwright should NOT have been called
     assert len(results) == 3
-    pw_mock.assert_not_called()
+    mock_browser.fetch.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -157,6 +161,7 @@ async def test_chunk_selection_applied_with_query(mock_client):
         resp.status_code = 200
         resp.text = _make_html("Rate Limiting Guide", long_content)
         resp.raise_for_status = MagicMock()
+        resp.headers = {}
         return resp
 
     mock_client.get = mock_get
@@ -193,6 +198,7 @@ async def test_cache_hit_avoids_refetch(mock_client):
         content = "Fresh content from the web. " * 5
         resp.text = _make_html("Fresh Title", content)
         resp.raise_for_status = MagicMock()
+        resp.headers = {}
         return resp
 
     mock_client.get = mock_get
@@ -225,6 +231,7 @@ async def test_fetched_urls_get_cached(mock_client):
         resp.status_code = 200
         resp.text = _make_html("Page Title", content)
         resp.raise_for_status = MagicMock()
+        resp.headers = {}
         return resp
 
     mock_client.get = mock_get

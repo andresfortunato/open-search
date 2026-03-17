@@ -5,8 +5,10 @@ Install with: pip install open-search-mcp[browser]
 """
 
 import asyncio
+import ipaddress
 import logging
 import random
+from urllib.parse import urlparse
 
 import httpx
 import trafilatura
@@ -16,10 +18,30 @@ from .chunker import select_chunks
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_TIMEOUT = 8.0
-MAX_CONCURRENT = 5
-MAX_CONTENT_LENGTH = 20_000
-TARGET_CHUNK_CHARS = 500
+# Max bytes to read from a single HTTP response (prevents memory exhaustion)
+MAX_FETCH_BYTES = 5 * 1024 * 1024  # 5 MB
+
+_PRIVATE_NETS = [
+    ipaddress.ip_network(n) for n in (
+        "10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16",
+        "127.0.0.0/8", "169.254.0.0/16", "::1/128", "fc00::/7",
+    )
+]
+
+
+def _validate_url(url: str) -> None:
+    """Reject URLs with non-HTTP schemes or private/internal IP addresses."""
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        raise ValueError(f"Disallowed URL scheme: {parsed.scheme!r}")
+    host = parsed.hostname or ""
+    try:
+        addr = ipaddress.ip_address(host)
+        if any(addr in net for net in _PRIVATE_NETS):
+            raise ValueError(f"Blocked private address: {host!r}")
+    except ValueError as e:
+        if "Blocked" in str(e):
+            raise
 
 # Rotate User-Agent to reduce 403s from sites that block bots
 _USER_AGENTS = [
@@ -39,38 +61,10 @@ except ImportError:
     pass
 
 
-async def fetch_url(
-    client: httpx.AsyncClient,
-    url: str,
-    semaphore: asyncio.Semaphore,
-) -> tuple[str, str | None]:
-    """Fetch a single URL, returning (url, html_or_none)."""
-    async with semaphore:
-        try:
-            resp = await client.get(url)
-            resp.raise_for_status()
-            return (url, resp.text)
-        except Exception as e:
-            logger.warning("Failed to fetch %s: %s", url, e)
-            return (url, None)
-
-
-async def fetch_many(
-    client: httpx.AsyncClient,
-    urls: list[str],
-    max_concurrent: int = MAX_CONCURRENT,
-) -> dict[str, str | None]:
-    """Fetch multiple URLs concurrently. Returns {url: html_or_none}."""
-    semaphore = asyncio.Semaphore(max_concurrent)
-    tasks = [fetch_url(client, url, semaphore) for url in urls]
-    results = await asyncio.gather(*tasks)
-    return dict(results)
-
-
 def extract_content(
     html: str,
     url: str,
-    max_length: int = MAX_CONTENT_LENGTH,
+    max_length: int = 20_000,
 ) -> dict | None:
     """Extract clean markdown content from HTML using trafilatura.
 
@@ -103,50 +97,85 @@ def extract_content(
 
         return {"title": title or "", "content": content.strip()}
     except Exception as e:
-        logger.warning("Extraction failed for %s: %s", url, e)
+        logger.warning("Extraction failed for %r: %s", url, e)
         return None
 
 
 async def extract_content_async(
     html: str,
     url: str,
-    max_length: int = MAX_CONTENT_LENGTH,
+    max_length: int = 20_000,
 ) -> dict | None:
     """Async wrapper — runs trafilatura in a thread pool."""
     return await asyncio.to_thread(extract_content, html, url, max_length)
 
 
-async def fetch_with_playwright(
-    urls: list[str],
-    timeout_ms: int = 8000,
-) -> dict[str, str | None]:
-    """Fetch URLs using a headless browser. Handles JS-rendered pages.
+class PlaywrightBrowser:
+    """Persistent headless browser for Playwright fallback.
 
-    Returns {url: html_or_none}. Only called for URLs that failed with httpx.
+    Reuses a single Chromium instance across searches. Each URL gets a fresh
+    browser context (isolated cookies/storage) to prevent cross-site leakage.
     """
-    if not _playwright_available:
-        return {url: None for url in urls}
 
-    results: dict[str, str | None] = {}
-    try:
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(headless=True)
-            page = await browser.new_page()
-            for url in urls:
-                try:
-                    await page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms)
-                    # Brief wait for JS rendering
-                    await page.wait_for_timeout(1000)
-                    html = await page.content()
-                    results[url] = html
-                except Exception as e:
-                    logger.warning("Playwright failed for %s: %s", url, e)
-                    results[url] = None
-            await browser.close()
-    except Exception as e:
-        logger.warning("Playwright browser launch failed: %s", e)
-        return {url: None for url in urls}
-    return results
+    def __init__(self) -> None:
+        self._playwright = None
+        self._browser = None
+
+    async def start(self) -> None:
+        """Launch the browser. Called once during MCP lifespan startup."""
+        if not _playwright_available:
+            return
+        self._playwright = await async_playwright().start()
+        self._browser = await self._playwright.chromium.launch(headless=True)
+        logger.info("Playwright browser launched.")
+
+    async def stop(self) -> None:
+        """Close the browser. Called during MCP lifespan shutdown."""
+        if self._browser:
+            await self._browser.close()
+        if self._playwright:
+            await self._playwright.stop()
+        self._browser = None
+        self._playwright = None
+
+    @property
+    def available(self) -> bool:
+        return self._browser is not None
+
+    async def fetch(
+        self,
+        urls: list[str],
+        timeout_ms: int = 8000,
+    ) -> dict[str, str | None]:
+        """Fetch URLs using the persistent browser.
+
+        Each URL gets a fresh context (cookies, storage, JS state are isolated).
+        """
+        if not self.available:
+            return {url: None for url in urls}
+
+        results: dict[str, str | None] = {}
+        for url in urls:
+            try:
+                _validate_url(url)
+            except ValueError:
+                results[url] = None
+                continue
+
+            context = await self._browser.new_context()
+            page = await context.new_page()
+            try:
+                await page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms)
+                await page.wait_for_timeout(1000)
+                html = await page.content()
+                results[url] = html
+            except Exception as e:
+                logger.warning("Playwright failed for %r: %s", url, e)
+                results[url] = None
+            finally:
+                await context.close()
+
+        return results
 
 
 async def fetch_and_extract(
@@ -155,9 +184,10 @@ async def fetch_and_extract(
     query: str | None = None,
     max_results: int | None = None,
     cache: URLCache | None = None,
-    max_concurrent: int = MAX_CONCURRENT,
-    max_length: int = MAX_CONTENT_LENGTH,
-    target_chars: int = TARGET_CHUNK_CHARS,
+    browser: PlaywrightBrowser | None = None,
+    max_concurrent: int = 5,
+    max_length: int = 20_000,
+    target_chars: int = 500,
 ) -> list[dict]:
     """Fetch URLs and extract content concurrently with early return.
 
@@ -192,14 +222,25 @@ async def fetch_and_extract(
     # Launch all fetches as tasks
     async def fetch_and_process(url: str) -> dict | None:
         """Fetch one URL, extract content. Returns result dict or None."""
+        try:
+            _validate_url(url)
+        except ValueError as e:
+            logger.warning("Skipping invalid URL %r: %s", url, e)
+            return None
+
         async with semaphore:
             try:
                 headers = {"User-Agent": random.choice(_USER_AGENTS)}
                 resp = await client.get(url, headers=headers)
                 resp.raise_for_status()
-                html = resp.text
+                # Limit response size to prevent memory exhaustion
+                content_length = resp.headers.get("content-length")
+                if content_length and int(content_length) > MAX_FETCH_BYTES:
+                    logger.warning("Skipping oversized response from %r: %s bytes", url, content_length)
+                    return None
+                html = resp.text[:MAX_FETCH_BYTES]
             except Exception as e:
-                logger.warning("Failed to fetch %s: %s", url, e)
+                logger.warning("Failed to fetch %r: %s", url, e)
                 return None
 
         extracted = await extract_content_async(html, url, max_length)
@@ -237,11 +278,11 @@ async def fetch_and_extract(
                 failed_urls.append(url)
 
     # Playwright fallback — only if we don't have enough results
-    if len(results) < target_count and failed_urls and _playwright_available:
+    if len(results) < target_count and failed_urls and browser and browser.available:
         needed = target_count - len(results)
         retry_urls = failed_urls[:needed * 2]  # try up to 2x what we need
         logger.info("Retrying %d URLs with Playwright...", len(retry_urls))
-        pw_html = await fetch_with_playwright(retry_urls)
+        pw_html = await browser.fetch(retry_urls)
         for url, html in pw_html.items():
             if html and len(results) < target_count:
                 extracted = await extract_content_async(html, url, max_length)
