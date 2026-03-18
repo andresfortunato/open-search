@@ -16,19 +16,20 @@ Claude Code's built-in search tools have significant limitations:
 
 ## Eval Results
 
-Head-to-head comparison across 5 diverse queries (technical, scientific, how-to):
+Head-to-head comparison across 20 diverse queries (technical, scientific, practical, domain-specific):
 
 | Metric | open-search-mcp | WebSearch | WebSearch+WebFetch |
 |--------|----------------|-----------|-------------------|
-| Latency | **4.1s** | ~3s | ~6-10s (multi-call) |
-| Tokens/query | **535** | ~650 | ~1,300+ |
+| Latency | **3.9s avg** (2.0-5.7s) | ~3s | ~6-10s (multi-call) |
+| Tokens/query | **~595** | ~700 | ~1,400+ |
+| Results per query | **5** | 10 links + summary | 1-3 per WebFetch |
 | Tool calls | **1** | 1 | 3-6 |
 | Content fidelity | **Verbatim excerpts** | AI-rewritten | AI-summarized |
-| Extraction success | **76%** (90%+ with browser) | N/A | 50% |
+| Extraction success | **100%** (5/5 every query) | N/A | ~50% |
 | Auto-approvable | **Yes** | No | No |
 | Code examples preserved | **Yes** | No (paraphrased) | Sometimes |
 
-Full eval data: `research/baseline_comparison.md`
+Full eval data: `research/eval_20_results.json`
 
 ## Prerequisites
 

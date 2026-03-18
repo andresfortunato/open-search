@@ -1,0 +1,142 @@
+[
+  {
+    "query": "how to implement rate limiting in FastAPI",
+    "total_ms": 5157,
+    "num_results": 5,
+    "total_chars": 2249,
+    "est_tokens": 562
+  },
+  {
+    "query": "rust async await best practices",
+    "total_ms": 2591,
+    "num_results": 5,
+    "total_chars": 3493,
+    "est_tokens": 873
+  },
+  {
+    "query": "kubernetes horizontal pod autoscaler configuration",
+    "total_ms": 3380,
+    "num_results": 5,
+    "total_chars": 2419,
+    "est_tokens": 605
+  },
+  {
+    "query": "PostgreSQL window functions examples",
+    "total_ms": 2883,
+    "num_results": 5,
+    "total_chars": 2769,
+    "est_tokens": 692
+  },
+  {
+    "query": "WebSocket vs Server-Sent Events comparison",
+    "total_ms": 3731,
+    "num_results": 5,
+    "total_chars": 2355,
+    "est_tokens": 589
+  },
+  {
+    "query": "what causes lithium battery thermal runaway",
+    "total_ms": 4682,
+    "num_results": 5,
+    "total_chars": 3067,
+    "est_tokens": 767
+  },
+  {
+    "query": "how does mRNA vaccine technology work",
+    "total_ms": 3284,
+    "num_results": 5,
+    "total_chars": 2496,
+    "est_tokens": 624
+  },
+  {
+    "query": "CRISPR gene editing mechanism explained",
+    "total_ms": 3614,
+    "num_results": 5,
+    "total_chars": 1564,
+    "est_tokens": 391
+  },
+  {
+    "query": "quantum computing error correction methods",
+    "total_ms": 2038,
+    "num_results": 5,
+    "total_chars": 2228,
+    "est_tokens": 557
+  },
+  {
+    "query": "how do solar panels convert light to electricity",
+    "total_ms": 4577,
+    "num_results": 5,
+    "total_chars": 2402,
+    "est_tokens": 600
+  },
+  {
+    "query": "how to set up a SearXNG instance",
+    "total_ms": 5428,
+    "num_results": 5,
+    "total_chars": 2516,
+    "est_tokens": 629
+  },
+  {
+    "query": "best practices for Docker container security",
+    "total_ms": 5722,
+    "num_results": 5,
+    "total_chars": 2323,
+    "est_tokens": 581
+  },
+  {
+    "query": "how to configure nginx reverse proxy",
+    "total_ms": 3633,
+    "num_results": 5,
+    "total_chars": 2151,
+    "est_tokens": 538
+  },
+  {
+    "query": "git rebase vs merge when to use which",
+    "total_ms": 2931,
+    "num_results": 5,
+    "total_chars": 2066,
+    "est_tokens": 516
+  },
+  {
+    "query": "how to optimize Python memory usage",
+    "total_ms": 3930,
+    "num_results": 5,
+    "total_chars": 2849,
+    "est_tokens": 712
+  },
+  {
+    "query": "GDPR data processing agreement requirements",
+    "total_ms": 4500,
+    "num_results": 5,
+    "total_chars": 2007,
+    "est_tokens": 502
+  },
+  {
+    "query": "transformer architecture attention mechanism explained",
+    "total_ms": 3906,
+    "num_results": 5,
+    "total_chars": 1733,
+    "est_tokens": 433
+  },
+  {
+    "query": "climate change impact on coral reef ecosystems",
+    "total_ms": 2639,
+    "num_results": 5,
+    "total_chars": 2467,
+    "est_tokens": 617
+  },
+  {
+    "query": "microservices vs monolith architecture tradeoffs",
+    "total_ms": 4884,
+    "num_results": 5,
+    "total_chars": 2134,
+    "est_tokens": 534
+  },
+  {
+    "query": "zero trust network security architecture",
+    "total_ms": 5099,
+    "num_results": 5,
+    "total_chars": 2281,
+    "est_tokens": 570
+  }
+]
