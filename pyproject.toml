@@ -33,6 +33,7 @@ dependencies = [
 
 [project.scripts]
 open-search-mcp = "open_search_mcp.server:main"
+open-search-mcp-setup = "open_search_mcp.server:setup"
 
 [tool.setuptools]
 packages = ["open_search_mcp"]

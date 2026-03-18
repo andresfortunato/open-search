@@ -77,9 +77,15 @@ Add to `~/.claude.json`:
 }
 ```
 
-### Automatic search preference
+### Make it the default search (one-time setup)
 
-On startup, the MCP server installs a rule to `~/.claude/rules/open-search-preference.md`, which tells Claude Code to prefer open-search over the built-in WebSearch/WebFetch in **all projects**. The rule auto-updates when you update the package. No manual setup needed.
+After installing, run setup to tell Claude Code to prefer open-search over WebSearch/WebFetch in all projects:
+
+```bash
+uvx --from git+https://github.com/andresfortunato/open-search.git open-search-mcp --setup
+```
+
+This installs a rule to `~/.claude/rules/open-search-preference.md`. Run it once — it persists across sessions and projects.
 
 ## Tools
 

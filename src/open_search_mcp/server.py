@@ -122,7 +122,6 @@ def _ensure_search_rule() -> None:
 @asynccontextmanager
 async def app_lifespan(server: FastMCP):
     """Start SearXNG if needed, pre-warm embedding model, provide shared httpx client."""
-    _ensure_search_rule()
     _ensure_searxng_secret_key()
 
     logger.warning("[open-search] Starting SearXNG...")
@@ -355,7 +354,17 @@ async def extract(
     return "\n\n---\n\n".join(parts)
 
 
+def setup() -> None:
+    """One-time setup: install search preference rule to ~/.claude/rules/."""
+    _ensure_search_rule()
+    print("open-search-mcp setup complete.")
+
+
 def main() -> None:
+    import sys
+    if "--setup" in sys.argv:
+        setup()
+        return
     mcp.run(transport="stdio")
 
 
