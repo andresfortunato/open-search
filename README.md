@@ -79,13 +79,13 @@ Add to `~/.claude.json`:
 
 ### Make it the default search
 
-Add this to your `~/.claude/CLAUDE.md` (global) or project `CLAUDE.md` so Claude Code prefers open-search over the built-in WebSearch:
+This repo ships with `.claude/rules/search-preference.md` which automatically tells Claude to prefer open-search over the built-in WebSearch/WebFetch. It loads into every session when working in this project.
 
-```markdown
-# Search
-Use the `search` MCP tool (from open-search) instead of WebSearch for all web searches.
-Use the `extract` MCP tool instead of WebFetch for URL content extraction.
-These tools return verbatim source text with higher extraction success in a single tool call.
+To apply globally (all projects), symlink the rule to your user rules:
+
+```bash
+mkdir -p ~/.claude/rules
+ln -s /path/to/open-search/.claude/rules/search-preference.md ~/.claude/rules/search-preference.md
 ```
 
 ## Tools
