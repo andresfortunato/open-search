@@ -79,7 +79,7 @@ Add to `~/.claude.json`:
 
 ### Automatic search preference
 
-On first startup, the MCP server symlinks `.claude/rules/search-preference.md` to `~/.claude/rules/`, which tells Claude Code to prefer open-search over the built-in WebSearch/WebFetch in **all projects**. No manual setup needed.
+On startup, the MCP server installs a rule to `~/.claude/rules/open-search-preference.md`, which tells Claude Code to prefer open-search over the built-in WebSearch/WebFetch in **all projects**. The rule auto-updates when you update the package. No manual setup needed.
 
 ## Tools
 
