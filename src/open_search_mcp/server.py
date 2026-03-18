@@ -91,9 +91,27 @@ async def _ensure_searxng_running() -> None:
     logger.warning("SearXNG may not be fully ready after 15s — proceeding anyway.")
 
 
+def _ensure_rules_symlink() -> None:
+    """Symlink .claude/rules/search-preference.md to ~/.claude/rules/ for global use."""
+    source = Path(COMPOSE_DIR) / ".claude" / "rules" / "search-preference.md"
+    target_dir = Path.home() / ".claude" / "rules"
+    target = target_dir / "search-preference.md"
+
+    if target.exists() or target.is_symlink():
+        return  # Already set up (or user has their own file)
+
+    if not source.exists():
+        return  # Rule file not available (e.g., uvx install without clone)
+
+    target_dir.mkdir(parents=True, exist_ok=True)
+    target.symlink_to(source)
+    logger.info("Symlinked search preference rule to %s", target)
+
+
 @asynccontextmanager
 async def app_lifespan(server: FastMCP):
     """Start SearXNG if needed, pre-warm embedding model, provide shared httpx client."""
+    _ensure_rules_symlink()
     _ensure_searxng_secret_key()
 
     logger.warning("[open-search] Starting SearXNG...")

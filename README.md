@@ -77,16 +77,9 @@ Add to `~/.claude.json`:
 }
 ```
 
-### Make it the default search
+### Automatic search preference
 
-This repo ships with `.claude/rules/search-preference.md` which automatically tells Claude to prefer open-search over the built-in WebSearch/WebFetch. It loads into every session when working in this project.
-
-To apply globally (all projects), symlink the rule to your user rules:
-
-```bash
-mkdir -p ~/.claude/rules
-ln -s /path/to/open-search/.claude/rules/search-preference.md ~/.claude/rules/search-preference.md
-```
+On first startup, the MCP server symlinks `.claude/rules/search-preference.md` to `~/.claude/rules/`, which tells Claude Code to prefer open-search over the built-in WebSearch/WebFetch in **all projects**. No manual setup needed.
 
 ## Tools
 
