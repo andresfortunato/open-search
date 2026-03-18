@@ -259,24 +259,27 @@ async def search(
     )
     t_extract = time.perf_counter() - t0
 
-    # Step 3: Fall back to snippets for URLs where extraction failed
-    extracted_urls = {r["url"] for r in extracted}
-    for sr in search_results:
-        if sr["url"] not in extracted_urls and sr["snippet"]:
-            extracted.append({
-                "url": sr["url"],
-                "title": sr["title"],
-                "content": f"[snippet] {sr['snippet']}",
-            })
-
     if not extracted:
         return f"Found {len(search_results)} results but failed to extract content from any. Search snippets:\n\n" + "\n".join(
             f"- [{r['title']}]({r['url']}): [snippet] {r['snippet']}" for r in search_results[:max_results]
         )
 
-    # Step 4: Score with BM25 and return top results
+    # Step 3: Score full extractions with BM25, then fill remaining slots with snippets
     scored = score_with_bm25(query, extracted, content_key="content")
     top = scored[:max_results]
+
+    # Only add snippets if we don't have enough full results
+    if len(top) < max_results:
+        extracted_urls = {r["url"] for r in top}
+        for sr in search_results:
+            if len(top) >= max_results:
+                break
+            if sr["url"] not in extracted_urls and sr["snippet"]:
+                top.append({
+                    "url": sr["url"],
+                    "title": sr["title"],
+                    "content": f"[snippet] {sr['snippet']}",
+                })
 
     t_total = time.perf_counter() - t_start
     total_chars = sum(len(r["content"]) for r in top)

@@ -1,142 +1,142 @@
 [
   {
     "query": "how to implement rate limiting in FastAPI",
-    "total_ms": 5157,
+    "total_ms": 3194,
     "num_results": 5,
-    "total_chars": 2249,
-    "est_tokens": 562
+    "total_chars": 5188,
+    "est_tokens": 1297
   },
   {
     "query": "rust async await best practices",
-    "total_ms": 2591,
+    "total_ms": 3067,
     "num_results": 5,
-    "total_chars": 3493,
-    "est_tokens": 873
+    "total_chars": 6281,
+    "est_tokens": 1570
   },
   {
     "query": "kubernetes horizontal pod autoscaler configuration",
-    "total_ms": 3380,
+    "total_ms": 2711,
     "num_results": 5,
-    "total_chars": 2419,
-    "est_tokens": 605
+    "total_chars": 5591,
+    "est_tokens": 1398
   },
   {
     "query": "PostgreSQL window functions examples",
-    "total_ms": 2883,
+    "total_ms": 2755,
     "num_results": 5,
-    "total_chars": 2769,
-    "est_tokens": 692
+    "total_chars": 5986,
+    "est_tokens": 1496
   },
   {
     "query": "WebSocket vs Server-Sent Events comparison",
-    "total_ms": 3731,
+    "total_ms": 3283,
     "num_results": 5,
-    "total_chars": 2355,
-    "est_tokens": 589
+    "total_chars": 4490,
+    "est_tokens": 1122
   },
   {
     "query": "what causes lithium battery thermal runaway",
-    "total_ms": 4682,
+    "total_ms": 4853,
     "num_results": 5,
-    "total_chars": 3067,
-    "est_tokens": 767
+    "total_chars": 6095,
+    "est_tokens": 1524
   },
   {
     "query": "how does mRNA vaccine technology work",
-    "total_ms": 3284,
+    "total_ms": 5094,
     "num_results": 5,
-    "total_chars": 2496,
-    "est_tokens": 624
+    "total_chars": 4317,
+    "est_tokens": 1079
   },
   {
     "query": "CRISPR gene editing mechanism explained",
-    "total_ms": 3614,
+    "total_ms": 6782,
     "num_results": 5,
-    "total_chars": 1564,
-    "est_tokens": 391
+    "total_chars": 4380,
+    "est_tokens": 1095
   },
   {
     "query": "quantum computing error correction methods",
-    "total_ms": 2038,
+    "total_ms": 4599,
     "num_results": 5,
-    "total_chars": 2228,
-    "est_tokens": 557
+    "total_chars": 6091,
+    "est_tokens": 1523
   },
   {
     "query": "how do solar panels convert light to electricity",
-    "total_ms": 4577,
+    "total_ms": 4420,
     "num_results": 5,
-    "total_chars": 2402,
-    "est_tokens": 600
+    "total_chars": 6177,
+    "est_tokens": 1544
   },
   {
     "query": "how to set up a SearXNG instance",
-    "total_ms": 5428,
+    "total_ms": 4997,
     "num_results": 5,
-    "total_chars": 2516,
-    "est_tokens": 629
+    "total_chars": 5209,
+    "est_tokens": 1302
   },
   {
     "query": "best practices for Docker container security",
-    "total_ms": 5722,
+    "total_ms": 6064,
     "num_results": 5,
-    "total_chars": 2323,
-    "est_tokens": 581
+    "total_chars": 7474,
+    "est_tokens": 1868
   },
   {
     "query": "how to configure nginx reverse proxy",
-    "total_ms": 3633,
+    "total_ms": 5052,
     "num_results": 5,
-    "total_chars": 2151,
-    "est_tokens": 538
+    "total_chars": 5160,
+    "est_tokens": 1290
   },
   {
     "query": "git rebase vs merge when to use which",
-    "total_ms": 2931,
+    "total_ms": 2887,
     "num_results": 5,
-    "total_chars": 2066,
-    "est_tokens": 516
+    "total_chars": 5182,
+    "est_tokens": 1296
   },
   {
     "query": "how to optimize Python memory usage",
-    "total_ms": 3930,
+    "total_ms": 3646,
     "num_results": 5,
-    "total_chars": 2849,
-    "est_tokens": 712
+    "total_chars": 5155,
+    "est_tokens": 1289
   },
   {
     "query": "GDPR data processing agreement requirements",
-    "total_ms": 4500,
+    "total_ms": 4880,
     "num_results": 5,
-    "total_chars": 2007,
-    "est_tokens": 502
+    "total_chars": 4937,
+    "est_tokens": 1234
   },
   {
     "query": "transformer architecture attention mechanism explained",
-    "total_ms": 3906,
+    "total_ms": 4699,
     "num_results": 5,
-    "total_chars": 1733,
-    "est_tokens": 433
+    "total_chars": 5428,
+    "est_tokens": 1357
   },
   {
     "query": "climate change impact on coral reef ecosystems",
-    "total_ms": 2639,
+    "total_ms": 4974,
     "num_results": 5,
-    "total_chars": 2467,
-    "est_tokens": 617
+    "total_chars": 6258,
+    "est_tokens": 1564
   },
   {
     "query": "microservices vs monolith architecture tradeoffs",
-    "total_ms": 4884,
+    "total_ms": 4280,
     "num_results": 5,
-    "total_chars": 2134,
-    "est_tokens": 534
+    "total_chars": 6473,
+    "est_tokens": 1618
   },
   {
     "query": "zero trust network security architecture",
-    "total_ms": 5099,
+    "total_ms": 8075,
     "num_results": 5,
-    "total_chars": 2281,
-    "est_tokens": 570
+    "total_chars": 6473,
+    "est_tokens": 1618
   }
 ]

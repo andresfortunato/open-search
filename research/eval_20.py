@@ -45,11 +45,11 @@ QUERIES = [
 ]
 
 
-async def run_query(client, query):
+async def run_query(client, browser, query):
     t0 = time.perf_counter()
     results = await search_searxng(client, query, SEARXNG_URL, max_results=MAX_RESULTS * 2)
     urls = [r["url"] for r in results]
-    extracted = await fetch_and_extract(client, urls, query=query, max_results=MAX_RESULTS)
+    extracted = await fetch_and_extract(client, urls, query=query, max_results=MAX_RESULTS, browser=browser)
 
     # Snippet fallback
     extracted_urls = {r["url"] for r in extracted}
@@ -76,8 +76,14 @@ async def run_query(client, query):
 
 
 async def main():
+    from open_search_mcp.extractor import PlaywrightBrowser
+
     print("Pre-warming model...")
     _get_model()
+
+    print("Starting Playwright browser...")
+    browser = PlaywrightBrowser()
+    await browser.start()
 
     results = []
     async with httpx.AsyncClient(
@@ -86,9 +92,11 @@ async def main():
         headers={"User-Agent": "search-mcp/0.1"},
     ) as client:
         for qi, query in enumerate(QUERIES, 1):
-            r = await run_query(client, query)
+            r = await run_query(client, browser, query)
             results.append(r)
             print(f"[{qi:>2}/{len(QUERIES)}] {r['total_ms']:>5}ms {r['est_tokens']:>4}tok {r['num_results']}r  {query[:55]}")
+
+    await browser.stop()
 
     out = Path(__file__).parent / "eval_20_results.json"
     with open(out, "w") as f:

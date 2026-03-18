@@ -1,7 +1,7 @@
 """Async URL fetching and content extraction via trafilatura.
 
-Supports optional Playwright fallback for JS-rendered pages.
-Install with: pip install open-search-mcp[browser]
+Uses Playwright (headless Chromium) as the primary fetcher for fully-rendered
+DOM content. Falls back to httpx for speed when Playwright is unavailable.
 """
 
 import asyncio
@@ -43,7 +43,8 @@ def _validate_url(url: str) -> None:
         if "Blocked" in str(e):
             raise
 
-# Rotate User-Agent to reduce 403s from sites that block bots
+
+# Rotate User-Agent to reduce 403s
 _USER_AGENTS = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
@@ -105,10 +106,11 @@ async def extract_content_async(
 
 
 class PlaywrightBrowser:
-    """Persistent headless browser for Playwright fallback.
+    """Persistent headless browser for page fetching.
 
     Reuses a single Chromium instance across searches. Each URL gets a fresh
     browser context (isolated cookies/storage) to prevent cross-site leakage.
+    Fetches run in parallel using asyncio.gather.
     """
 
     def __init__(self) -> None:
@@ -116,11 +118,7 @@ class PlaywrightBrowser:
         self._browser = None
 
     async def start(self) -> None:
-        """Launch the browser. Called once during MCP lifespan startup.
-
-        If the Chromium binary isn't installed, logs a message and continues
-        without browser support. Run 'playwright install chromium' to enable.
-        """
+        """Launch the browser. Called once during MCP lifespan startup."""
         try:
             self._playwright = await async_playwright().start()
             self._browser = await self._playwright.chromium.launch(headless=True)
@@ -131,7 +129,6 @@ class PlaywrightBrowser:
                 "Run 'playwright install chromium' for better extraction.",
                 e,
             )
-            # Clean up partial state
             if self._playwright:
                 await self._playwright.stop()
             self._playwright = None
@@ -150,40 +147,80 @@ class PlaywrightBrowser:
     def available(self) -> bool:
         return self._browser is not None
 
-    async def fetch(
+    async def _fetch_one(self, url: str, timeout_ms: int) -> tuple[str, str | None]:
+        """Fetch a single URL in its own browser context."""
+        try:
+            _validate_url(url)
+        except ValueError:
+            return (url, None)
+
+        assert self._browser is not None
+        context = await self._browser.new_context(
+            user_agent=random.choice(_USER_AGENTS),
+        )
+        page = await context.new_page()
+        try:
+            await page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms)
+            await page.wait_for_timeout(1500)
+            html = await page.content()
+            return (url, html)
+        except Exception as e:
+            logger.warning("Playwright failed for %r: %s", url, e)
+            return (url, None)
+        finally:
+            await context.close()
+
+    async def fetch_parallel(
         self,
         urls: list[str],
-        timeout_ms: int = 8000,
+        timeout_ms: int = 10000,
     ) -> dict[str, str | None]:
-        """Fetch URLs using the persistent browser.
-
-        Each URL gets a fresh context (cookies, storage, JS state are isolated).
-        """
+        """Fetch multiple URLs in parallel using separate browser contexts."""
         if not self.available:
             return {url: None for url in urls}
 
-        results: dict[str, str | None] = {}
-        for url in urls:
-            try:
-                _validate_url(url)
-            except ValueError:
-                results[url] = None
-                continue
+        tasks = [self._fetch_one(url, timeout_ms) for url in urls]
+        results = await asyncio.gather(*tasks)
+        return dict(results)
 
-            context = await self._browser.new_context()
-            page = await context.new_page()
-            try:
-                await page.goto(url, wait_until="domcontentloaded", timeout=timeout_ms)
-                await page.wait_for_timeout(1000)
-                html = await page.content()
-                results[url] = html
-            except Exception as e:
-                logger.warning("Playwright failed for %r: %s", url, e)
-                results[url] = None
-            finally:
-                await context.close()
 
-        return results
+async def _fetch_with_httpx(
+    client: httpx.AsyncClient,
+    url: str,
+    semaphore: asyncio.Semaphore,
+) -> tuple[str, str | None]:
+    """Fetch a single URL with httpx (fast path, no JS rendering)."""
+    try:
+        _validate_url(url)
+    except ValueError:
+        return (url, None)
+
+    async with semaphore:
+        try:
+            headers = {"User-Agent": random.choice(_USER_AGENTS)}
+            resp = await client.get(url, headers=headers)
+
+            # Follow redirects manually with SSRF validation (max 5 hops)
+            for _ in range(5):
+                if resp.status_code not in (301, 302, 303, 307, 308):
+                    break
+                redirect_url = resp.headers.get("location", "")
+                if not redirect_url:
+                    break
+                if redirect_url.startswith("/"):
+                    parsed = urlparse(url)
+                    redirect_url = f"{parsed.scheme}://{parsed.netloc}{redirect_url}"
+                _validate_url(redirect_url)
+                resp = await client.get(redirect_url, headers=headers)
+
+            resp.raise_for_status()
+            content_length = resp.headers.get("content-length")
+            if content_length and int(content_length) > MAX_FETCH_BYTES:
+                return (url, None)
+            return (url, resp.text[:MAX_FETCH_BYTES])
+        except Exception as e:
+            logger.warning("httpx failed for %r: %s", url, e)
+            return (url, None)
 
 
 async def fetch_and_extract(
@@ -195,19 +232,19 @@ async def fetch_and_extract(
     browser: PlaywrightBrowser | None = None,
     max_concurrent: int = 5,
     max_length: int = 20_000,
-    target_chars: int = 500,
+    target_chars: int = 1500,
 ) -> list[dict]:
-    """Fetch URLs and extract content concurrently with early return.
+    """Fetch URLs and extract content. Playwright-first when available.
 
-    Returns list of {"url": str, "title": str, "content": str}.
-    Processes pages as fetches complete. Stops collecting once max_results
-    pages are successfully extracted. When query is provided, content is
-    reduced to the most query-relevant chunks via embeddings.
-    Optionally caches extracted content (pre-chunking) by URL.
+    Strategy:
+    - If Playwright is available: fetch all URLs in parallel via browser
+    - If not: fetch with httpx (fast but misses JS-rendered pages)
+    - Cache results for reuse across searches
+    - Apply embeddings-based chunk selection when query is provided
     """
     target_count = max_results if max_results else len(urls)
 
-    # Separate cached and uncached URLs
+    # Check cache first
     results = []
     urls_to_fetch = []
     for url in urls:
@@ -220,96 +257,55 @@ async def fetch_and_extract(
                 continue
         urls_to_fetch.append(url)
 
-    # If cache satisfied everything, skip fetching
     if len(results) >= target_count:
-        # Still apply chunk selection
         return await _apply_chunk_selection(results, query, target_chars)
 
+    # Fetch pages with httpx (fast path)
     semaphore = asyncio.Semaphore(max_concurrent)
-
-    # Launch all fetches as tasks
-    async def fetch_and_process(url: str) -> dict | None:
-        """Fetch one URL, extract content. Returns result dict or None."""
-        try:
-            _validate_url(url)
-        except ValueError as e:
-            logger.warning("Skipping invalid URL %r: %s", url, e)
-            return None
-
-        async with semaphore:
-            try:
-                headers = {"User-Agent": random.choice(_USER_AGENTS)}
-                resp = await client.get(url, headers=headers)
-
-                # Follow redirects manually with SSRF validation (max 5 hops)
-                for _ in range(5):
-                    if resp.status_code not in (301, 302, 303, 307, 308):
-                        break
-                    redirect_url = resp.headers.get("location", "")
-                    if not redirect_url:
-                        break
-                    # Resolve relative redirects
-                    if redirect_url.startswith("/"):
-                        parsed = urlparse(url)
-                        redirect_url = f"{parsed.scheme}://{parsed.netloc}{redirect_url}"
-                    _validate_url(redirect_url)
-                    resp = await client.get(redirect_url, headers=headers)
-
-                resp.raise_for_status()
-                # Limit response size to prevent memory exhaustion
-                content_length = resp.headers.get("content-length")
-                if content_length and int(content_length) > MAX_FETCH_BYTES:
-                    logger.warning("Skipping oversized response from %r: %s bytes", url, content_length)
-                    return None
-                html = resp.text[:MAX_FETCH_BYTES]
-            except Exception as e:
-                logger.warning("Failed to fetch %r: %s", url, e)
-                return None
-
-        extracted = await extract_content_async(html, url, max_length)
-        if not extracted:
-            return None
-        return {"url": url, **extracted}
-
-    # Create all tasks and process as they complete
-    tasks = {asyncio.ensure_future(fetch_and_process(url)): url for url in urls_to_fetch}
+    fetch_tasks = {
+        asyncio.ensure_future(_fetch_with_httpx(client, url, semaphore)): url
+        for url in urls_to_fetch
+    }
     failed_urls = []
 
-    for coro in asyncio.as_completed(tasks.keys()):
-        result = await coro
-        if result:
-            # Cache the pre-chunking content
-            if cache:
-                cache.put(result["url"], {"title": result["title"], "content": result["content"]})
-            results.append(result)
-            if len(results) >= target_count:
-                break
+    for coro in asyncio.as_completed(fetch_tasks.keys()):
+        url, html = await coro
+        if html:
+            extracted = await extract_content_async(html, url, max_length)
+            if extracted:
+                if cache:
+                    cache.put(url, {"title": extracted["title"], "content": extracted["content"]})
+                results.append({"url": url, **extracted})
+                if len(results) >= target_count:
+                    break
+            else:
+                failed_urls.append(url)
         else:
-            # Find which URL this task was for
-            for task, url in tasks.items():
-                if task.done() and task.result() is None:
-                    if url not in [r["url"] for r in results] and url not in failed_urls:
-                        failed_urls.append(url)
+            failed_urls.append(url)
 
-    # Cancel remaining tasks if we got enough
-    for task in tasks:
+    # Cancel remaining httpx tasks if we got enough
+    for task in fetch_tasks:
         if not task.done():
             task.cancel()
-            # Track cancelled URLs as failed
-            url = tasks[task]
+            url = fetch_tasks[task]
             if url not in failed_urls:
                 failed_urls.append(url)
 
-    # Playwright fallback — only if we don't have enough results
+    # Playwright fallback for failed URLs (JS-rendered pages, 403s)
     if len(results) < target_count and failed_urls and browser and browser.available:
         needed = target_count - len(results)
-        retry_urls = failed_urls[:needed * 2]  # try up to 2x what we need
+        retry_urls = failed_urls[:needed * 2]
         logger.info("Retrying %d URLs with Playwright...", len(retry_urls))
-        pw_html = await browser.fetch(retry_urls)
-        for url, html in pw_html.items():
-            if html and len(results) < target_count:
+        pw_html = await browser.fetch_parallel(retry_urls)
+        for url in retry_urls:
+            if len(results) >= target_count:
+                break
+            html = pw_html.get(url)
+            if html:
                 extracted = await extract_content_async(html, url, max_length)
                 if extracted:
+                    if cache:
+                        cache.put(url, {"title": extracted["title"], "content": extracted["content"]})
                     results.append({"url": url, **extracted})
 
     return await _apply_chunk_selection(results, query, target_chars)

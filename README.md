@@ -20,8 +20,8 @@ Head-to-head comparison across 20 diverse queries (technical, scientific, practi
 
 | Metric | open-search-mcp | WebSearch | WebSearch+WebFetch |
 |--------|----------------|-----------|-------------------|
-| Latency | **3.9s avg** (2.0-5.7s) | ~3s | ~6-10s (multi-call) |
-| Tokens/query | **~595** | ~700 | ~1,400+ |
+| Latency | **4.5s avg** (2.7-8.1s) | ~3s | ~6-10s (multi-call) |
+| Tokens/query | **~1,400** | ~700 | ~1,400+ |
 | Results per query | **5** | 10 links + summary | 1-3 per WebFetch |
 | Tool calls | **1** | 1 | 3-6 |
 | Content fidelity | **Verbatim excerpts** | AI-rewritten | AI-summarized |

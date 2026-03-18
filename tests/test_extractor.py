@@ -128,9 +128,10 @@ async def test_skips_playwright_when_enough_results(mock_client):
 
     mock_client.get = mock_get
 
+    # httpx succeeds for all URLs, so Playwright should NOT be called
     mock_browser = MagicMock(spec=PlaywrightBrowser)
     mock_browser.available = True
-    mock_browser.fetch = AsyncMock(return_value={})
+    mock_browser.fetch_parallel = AsyncMock(return_value={})
 
     results = await fetch_and_extract(
         client=mock_client,
@@ -141,7 +142,7 @@ async def test_skips_playwright_when_enough_results(mock_client):
 
     # Should have 3 results and Playwright should NOT have been called
     assert len(results) == 3
-    mock_browser.fetch.assert_not_called()
+    mock_browser.fetch_parallel.assert_not_called()
 
 
 @pytest.mark.asyncio
